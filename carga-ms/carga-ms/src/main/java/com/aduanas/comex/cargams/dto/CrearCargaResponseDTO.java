@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CrearCargaResponseDTO {
 
+
     private Long cargaId;
     private String nroDeclaracion;
     private String descripcion;
