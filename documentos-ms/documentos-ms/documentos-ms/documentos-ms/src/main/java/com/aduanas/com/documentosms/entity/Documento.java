@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "documentos")
+@Table(name = "documento")
 
 
 public class Documento {
@@ -38,7 +38,6 @@ public class Documento {
     @Column(name = "observacion_manual", length = 500)
     private String observacionManual;
 
-    @Column(name= "Resultado_Revision", length = 500)
     private String ResultadoRevision;
 
     @Enumerated(EnumType.STRING)
