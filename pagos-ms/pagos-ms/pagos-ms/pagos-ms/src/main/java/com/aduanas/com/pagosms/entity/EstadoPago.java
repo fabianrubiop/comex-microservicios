@@ -1,0 +1,11 @@
+package com.aduanas.com.pagosms.entity;
+
+public enum EstadoPago {
+
+    PENDIENTE,   // El usuario aún no paga
+    PROCESANDO,  // El pago está en validación (ej. transferencia bancaria)
+    COMPLETADO,  // ¡Plata en mano!
+    FALLIDO,     // La tarjeta rebotó o hubo error
+    REEMBOLSADO  // Se le devolvió el dinero al cliente
+
+}
