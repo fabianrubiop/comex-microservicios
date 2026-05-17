@@ -9,10 +9,11 @@ import java.math.BigDecimal;
 @Builder
 public class ClasificacionResponseDTO {
 
-    private Long clasificacionId;
+    private Long id;
     private Long cargaId;
     private String tipoClasificacion;
     private Boolean permitido;
     private BigDecimal montoImpuesto;
     private String observaciones;
+
 }

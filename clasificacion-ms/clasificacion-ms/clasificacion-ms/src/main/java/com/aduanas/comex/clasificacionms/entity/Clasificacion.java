@@ -1,11 +1,9 @@
 package com.aduanas.comex.clasificacionms.entity;
 
+
 import com.aduanas.comex.clasificacionms.enums.TipoClasificacion;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,19 +18,19 @@ public class Clasificacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long clasificacionId;
+    private Long id;
 
     @Column(name = "carga_id", nullable = false)
     private Long cargaId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "tipo_clasificacion", nullable = false)
     private TipoClasificacion tipoClasificacion;
 
     @Column(nullable = false)
     private Boolean permitido;
 
-    @Column(nullable = false, precision = 15, scale = 2)
+    @Column(name = "monto_impuesto", nullable = false, precision = 15, scale = 2)
     private BigDecimal montoImpuesto;
 
     @Column(length = 500)

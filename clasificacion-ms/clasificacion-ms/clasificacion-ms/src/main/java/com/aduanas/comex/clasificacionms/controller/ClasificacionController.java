@@ -1,7 +1,8 @@
 package com.aduanas.comex.clasificacionms.controller;
 
-import com.aduanas.comex.clasificacionms.dto.ClasificacionRequestDTO;
+
 import com.aduanas.comex.clasificacionms.dto.ClasificacionResponseDTO;
+import com.aduanas.comex.clasificacionms.dto.EvaluarClasificacionRequestDTO;
 import com.aduanas.comex.clasificacionms.service.ClasificacionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,18 +20,18 @@ public class ClasificacionController {
 
     @PostMapping("/evaluar")
     public ResponseEntity<ClasificacionResponseDTO> evaluar(
-            @Valid @RequestBody ClasificacionRequestDTO dto) {
+            @Valid @RequestBody EvaluarClasificacionRequestDTO dto) {
         return ResponseEntity.ok(clasificacionService.evaluar(dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<ClasificacionResponseDTO>> listar(){
+    public ResponseEntity<List<ClasificacionResponseDTO>> listar() {
         return ResponseEntity.ok(clasificacionService.listar());
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<ClasificacionResponseDTO> obtenerPorId(@PathVariable Long clasificacionId){
-        return ResponseEntity.ok(clasificacionService.obtenerPorId(clasificacionId));
+    public ResponseEntity<ClasificacionResponseDTO> obtenerPorId(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(clasificacionService.obtenerPorId(id));
     }
-
 }
