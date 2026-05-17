@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 
 // Nombre tabla MySQL
-@Table(name = "riesgos")
+@Table(name = "riesgo")
 public class Riesgo {
 
         // ===============================
