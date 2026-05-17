@@ -7,9 +7,12 @@ import com.aduanas.com.documentosms.dto.DocumentoResponseUsuarioExDTO;
 import com.aduanas.com.documentosms.entity.Documento;
 import com.aduanas.com.documentosms.entity.EstadoValidacion;
 import com.aduanas.com.documentosms.entity.EstadoValidacionArchivo;
+import com.aduanas.com.documentosms.exception.GlobalExceptionHandler;
 import com.aduanas.com.documentosms.repository.DocumentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import javax.swing.text.Document;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -70,6 +73,16 @@ public class DocumentoService {
                 m.getEstadoValidacion().name(),
                 m.getFechaDocumento() // Pasa al constructor de fechaCreacion
         );
+    }
+
+    public DocumentoResponseAnalistaDTO buscarPorId(Long id) {
+        // 1. Buscamos el documento en la BD usando tu repositorio
+        Documento documento = documentoRepository.findById(id)
+                // Si NO existe, lanzamos una RuntimeException para que la atrape tu GlobalExceptionHandler
+                .orElseThrow(() -> new RuntimeException("Documento no encontrado con el ID: " + id));
+
+        // 2. Convertimos la Entidad a DTO usando el traductor privado que ya tienes abajo
+        return mapToAnalistaDTO(documento);
     }
 
     // Calza con: id, estado, datosExtraidos, fechaRevision
