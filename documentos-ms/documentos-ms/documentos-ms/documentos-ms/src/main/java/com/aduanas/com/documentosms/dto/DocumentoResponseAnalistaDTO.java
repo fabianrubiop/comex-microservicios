@@ -13,20 +13,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 
-public class DocumentoResponseDTO {
+public class DocumentoResponseAnalistaDTO {
 
-        private Long documentoId;
-
-        private String rutaArchivo;
-
-        private String tipoDocumento;
-
-        private String datosExtraidos;
-
-        private EstadoValidacion estadoValidacion;
-
-        private LocalDateTime fechaDocumento;
-
+    private Long documentoId;
+    private String estadoValidacion;
+    private String datosExtraidos;     // Tu nombre real de variable
+    private LocalDateTime fechaRevision; // Tu nombre real de variable
 
 
 }
