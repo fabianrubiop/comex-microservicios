@@ -2,7 +2,9 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/carga-ms/carga-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/clasificacion-ms/clasificacion-ms/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/documentos-ms/documentos-ms/documentos-ms/documentos-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pagos-ms/pagos-ms/pagos-ms/pagos-ms/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/riesgo-ms/src/main/java" charset="UTF-8" />
   </component>
 </project>
