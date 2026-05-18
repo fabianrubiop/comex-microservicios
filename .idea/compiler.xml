@@ -3,18 +3,19 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for clasificacion-ms" enabled="true">
+      <profile name="Annotation profile for riesgo-ms" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="clasificacion-ms" />
         <module name="riesgo-ms" />
+        <module name="clasificacion-ms" />
         <module name="carga-ms" />
         <module name="pagos-ms" />
         <module name="documentos-ms" />
+        <module name="gestion-carga-ms" />
       </profile>
     </annotationProcessing>
   </component>
@@ -23,6 +24,7 @@
       <module name="carga-ms" options="-parameters" />
       <module name="clasificacion-ms" options="-parameters" />
       <module name="documentos-ms" options="-parameters" />
+      <module name="gestion-carga-ms" options="-parameters" />
       <module name="pagos-ms" options="-parameters" />
       <module name="riesgo-ms" options="-parameters" />
     </option>

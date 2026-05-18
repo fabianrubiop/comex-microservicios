@@ -1,4 +1,4 @@
-package com.aduanas.com.documentosms.entity;
+package com.aduanas.com.documentosms.Enum;
 
 public enum EstadoValidacion {
     PENDIENTE,
