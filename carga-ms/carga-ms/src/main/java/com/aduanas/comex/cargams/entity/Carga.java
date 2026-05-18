@@ -34,6 +34,9 @@ public class Carga {
     @Column(name = "valor_declarado", nullable = false, precision = 15, scale = 2)
     private BigDecimal valorDeclarado;
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal peso;
+
     @Column(name = "rut_importador", nullable = false, length = 12)
     private String importadorRut;
 
