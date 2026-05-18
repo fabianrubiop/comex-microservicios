@@ -5,6 +5,7 @@ import com.aduanas.com.pagosms.client.CargaFeignClient;
 import com.aduanas.com.pagosms.dto.CargaExternaDto;
 import com.aduanas.com.pagosms.dto.PagoRequestDto;
 import com.aduanas.com.pagosms.dto.PagoResponseDto;
+import com.aduanas.com.pagosms.dto.NotificacionBancoDto;
 import com.aduanas.com.pagosms.entity.Pago;
 import com.aduanas.com.pagosms.repository.PagoRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,15 +25,14 @@ public class PagoService {
     private final CargaFeignClient cargaFeignClient;
 
     public PagoResponseDto procesarPago(PagoRequestDto dto) {
-
-        // 1. Llamada real al endpoint que me mostraste en la foto
+        // 1. Llamada real al endpoint de Cargas vía Feign
         CargaExternaDto carga = cargaFeignClient.obtenerCargaPorId(dto.getCargaId());
 
         if (carga == null) {
             throw new RuntimeException("La carga con ID " + dto.getCargaId() + " no existe en el sistema de Cargas.");
         }
 
-        // MODIFICACIÓN DE ACUERDO A TU FOTO: Ahora el estado correcto es "CLASIFICADA"
+        // Validación de Estado de la Carga
         if (!"CLASIFICADA".equalsIgnoreCase(carga.getEstado())) {
             throw new RuntimeException("No se puede procesar el pago. La carga requiere estar CLASIFICADA. Estado actual: " + carga.getEstado());
         }
@@ -66,18 +66,21 @@ public class PagoService {
             montoBase = montoBase.add(new BigDecimal("50000"));
         }
 
-        // 4. IVA (19% aplicado sobre la tarifa base del trámite aduanero)
-        BigDecimal valorIva = montoBase.multiply(new BigDecimal("0.19")).setScale(2, RoundingMode.HALF_UP);
+        // 4. MODIFICACIÓN ADUANAS: Rescatamos el IVA/Impuesto directo de la Clasificación
+        BigDecimal valorIva = carga.getMontoImpuesto();
+        if (valorIva == null) {
+            valorIva = BigDecimal.ZERO; // Respaldo por si viniera nulo
+        }
 
-        // 5. Total a cobrar al importador
+        // 5. Total a cobrar al importador (Base Tramo + Impuesto de Clasificación)
         BigDecimal montoCalculado = montoBase.add(valorIva).setScale(2, RoundingMode.HALF_UP);
 
-        // 6. Guardar el registro financiero en Laragon
+        // 6. Guardar el registro financiero inicial en Laragon
         Pago nuevoPago = new Pago();
-        nuevoPago.setCargaId(dto.getCargaId()); // Guarda la relación
+        nuevoPago.setCargaId(dto.getCargaId());
         nuevoPago.setMonto(montoCalculado);
         nuevoPago.setMoneda(dto.getMoneda());
-        nuevoPago.setEstadoPago(EstadoPago.PENDIENTE);
+        nuevoPago.setEstadoPago(EstadoPago.PENDIENTE); // Nace esperando la respuesta del banco
         nuevoPago.setTransaccionExternaId(dto.getTransaccionExternaId());
         nuevoPago.setFechaPago(LocalDateTime.now());
 
@@ -86,16 +89,64 @@ public class PagoService {
         return mapToResponseDTO(pagoGuardado, peso, valorIva);
     }
 
+    // =========================================================================
+    // 🏦 SIMULADOR BANCARIO: Confirma el pago, cambia a COMPLETADO y libera la Carga
+    // =========================================================================
+    public PagoResponseDto confirmarPagoDesdeBanco(NotificacionBancoDto bancoDto) {
+        // 1. Buscar el pago previo en Laragon
+        Pago pago = pagoRepository.findById(bancoDto.getPagoId())
+                .orElseThrow(() -> new RuntimeException("El pago con ID " + bancoDto.getPagoId() + " no existe."));
+
+        BigDecimal pesoReal = new BigDecimal("62.00");
+        BigDecimal impuestoReal = BigDecimal.ZERO;
+
+        try {
+            CargaExternaDto c = cargaFeignClient.obtenerCargaPorId(bancoDto.getCargaId());
+            if (c != null) {
+                pesoReal = c.getPeso();
+                if (c.getMontoImpuesto() != null) {
+                    impuestoReal = c.getMontoImpuesto();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("No se pudo obtener la carga externa mediante Feign.");
+        }
+
+        if (bancoDto.getTransaccionExitosa()) {
+            // 2. Modificar el estado local a COMPLETADO con los datos del váucher manual
+            pago.setEstadoPago(EstadoPago.COMPLETADO);
+            pago.setTransaccionExternaId(bancoDto.getTransaccionExternalId());
+            pago.setFechaPago(LocalDateTime.now());
+
+            pagoRepository.save(pago);
+
+            // 3. LA SINCRONIZACIÓN: Llamada PUT reactiva hacia el microservicio de Cargas
+            try {
+                cargaFeignClient.actualizarEstadoCarga(bancoDto.getCargaId(), "LIBERADA");
+            } catch (Exception e) {
+                throw new RuntimeException("Pago completado, pero falló la comunicación remota con Cargas: " + e.getMessage());
+            }
+        } else {
+            pago.setEstadoPago(EstadoPago.FALLIDO);
+            pagoRepository.save(pago);
+        }
+
+        return mapToResponseDTO(pago, pesoReal, impuestoReal);
+    }
+
     public List<PagoResponseDto> obtenerTodosLosPagos() {
         return pagoRepository.findAll().stream()
                 .map(p -> {
                     BigDecimal pesoReal = new BigDecimal("62.00");
+                    BigDecimal impuestoReal = BigDecimal.ZERO;
                     try {
                         CargaExternaDto c = cargaFeignClient.obtenerCargaPorId(p.getCargaId());
-                        if (c != null) pesoReal = c.getPeso();
+                        if (c != null) {
+                            pesoReal = c.getPeso();
+                            if (c.getMontoImpuesto() != null) impuestoReal = c.getMontoImpuesto();
+                        }
                     } catch (Exception e) {}
-                    BigDecimal valorIva = p.getMonto().multiply(new BigDecimal("0.159663")).setScale(2, RoundingMode.HALF_UP);
-                    return mapToResponseDTO(p, pesoReal, valorIva);
+                    return mapToResponseDTO(p, pesoReal, impuestoReal);
                 })
                 .collect(Collectors.toList());
     }
@@ -105,13 +156,16 @@ public class PagoService {
                 .orElseThrow(() -> new RuntimeException("El pago con ID " + id + " no existe en los registros."));
 
         BigDecimal pesoReal = new BigDecimal("62.00");
+        BigDecimal impuestoReal = BigDecimal.ZERO;
         try {
             CargaExternaDto c = cargaFeignClient.obtenerCargaPorId(pago.getCargaId());
-            if (c != null) pesoReal = c.getPeso();
+            if (c != null) {
+                pesoReal = c.getPeso();
+                if (c.getMontoImpuesto() != null) impuestoReal = c.getMontoImpuesto();
+            }
         } catch (Exception e) {}
 
-        BigDecimal valorIva = pago.getMonto().multiply(new BigDecimal("0.159663")).setScale(2, RoundingMode.HALF_UP);
-        return mapToResponseDTO(pago, pesoReal, valorIva);
+        return mapToResponseDTO(pago, pesoReal, impuestoReal);
     }
 
     private PagoResponseDto mapToResponseDTO(Pago p, BigDecimal peso, BigDecimal valorIva) {

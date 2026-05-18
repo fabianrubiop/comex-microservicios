@@ -6,6 +6,5 @@ public enum EstadoPago {
     PROCESANDO,  // El pago está en validación (ej. transferencia bancaria)
     COMPLETADO,  // ¡Plata en mano!
     FALLIDO,     // La tarjeta rebotó o hubo error
-    REEMBOLSADO  // Se le devolvió el dinero al cliente
 
 }
