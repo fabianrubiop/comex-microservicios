@@ -1,4 +1,4 @@
-package com.aduanas.com.pagosms.entity;
+package com.aduanas.com.pagosms.Enum;
 
 public enum EstadoPago {
 

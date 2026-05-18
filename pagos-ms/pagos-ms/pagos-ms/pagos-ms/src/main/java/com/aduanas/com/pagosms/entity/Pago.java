@@ -1,5 +1,6 @@
 package com.aduanas.com.pagosms.entity;
 
+import com.aduanas.com.pagosms.Enum.EstadoPago;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
