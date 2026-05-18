@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/clasificaciones")
+@RequestMapping("/api/v1/clasificaciones")
 @RequiredArgsConstructor
 public class ClasificacionController {
 
     private final ClasificacionService clasificacionService;
 
-    @PostMapping("/evaluar")
+    @PostMapping("/evaluar/{cargaId}")
     public ResponseEntity<ClasificacionResponseDTO> evaluar(
             @Valid @RequestBody EvaluarClasificacionRequestDTO dto) {
         return ResponseEntity.ok(clasificacionService.evaluar(dto));
@@ -31,7 +31,7 @@ public class ClasificacionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ClasificacionResponseDTO> obtenerPorId(
-            @PathVariable Long id) {
+            @PathVariable("id") Long id) {
         return ResponseEntity.ok(clasificacionService.obtenerPorId(id));
     }
 }

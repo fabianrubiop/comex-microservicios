@@ -42,17 +42,17 @@ public class CargaService {
                 .build();
 
         carga = cargaRepository.save(carga);
-        log.debug("Carga persistida con éxito de manera local con ID: {}", carga.getCargaId());
+        log.debug("Carga persistida con éxito de manera local con ID: {}", carga.getId());
 
         // 2. Preparar la petición para el Microservicio de Clasificación
         ClasificacionRequestDTO extRequest = ClasificacionRequestDTO.builder()
-                .cargaId(carga.getCargaId())
+                .cargaId(carga.getId())
                 .descripcionMercancia(carga.getDescripcion())
                 .paisOrigen(carga.getPaisOrigen())
                 .valorDeclarado(carga.getValorDeclarado())
                 .build();
 
-        log.info("Llamando de forma síncrona a clasificacion-cumplimiento-ms para Carga ID: {}", carga.getCargaId());
+        log.info("Llamando de forma síncrona a clasificacion-cumplimiento-ms para Carga ID: {}", carga.getId());
 
         // 3. Comunicación Inter-servicio vía Feign
         ClasificacionResponseDTO extResponse = clasificacionClient.evaluar(extRequest);
@@ -68,7 +68,7 @@ public class CargaService {
 
         // 5. Construir y retornar el DTO unificado final
         return CargaResponseDTO.builder()
-                .id(carga.getCargaId())
+                .id(carga.getId())
                 .numeroDeclaracion(carga.getNroDeclaracion())
                 .descripcion(carga.getDescripcion())
                 .paisOrigen(carga.getPaisOrigen())
