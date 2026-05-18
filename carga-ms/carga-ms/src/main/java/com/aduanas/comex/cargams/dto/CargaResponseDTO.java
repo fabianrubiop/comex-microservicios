@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class CargaResponseDTO {
+
     private Long id;
     private String numeroDeclaracion;
     private String descripcion;
