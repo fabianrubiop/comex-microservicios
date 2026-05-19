@@ -81,6 +81,7 @@ public class NotificacionService {
         return convertirResponseDTO(entity);
     }
 
+
     // BUSCAR POR ESTADO
     public List<NotificacionResponseDTO>
     buscarPorEstado(String estado) {
