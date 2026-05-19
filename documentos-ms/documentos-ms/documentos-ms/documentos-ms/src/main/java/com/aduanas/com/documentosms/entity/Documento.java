@@ -1,5 +1,5 @@
 package com.aduanas.com.documentosms.entity;
-
+import com.aduanas.com.documentosms.Enum.EstadoValidacion;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
