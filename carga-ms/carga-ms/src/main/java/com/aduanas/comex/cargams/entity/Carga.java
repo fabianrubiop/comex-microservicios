@@ -48,4 +48,7 @@ public class Carga {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
+    @Column(name = "monto_impuesto", precision = 15, scale = 2)
+    private BigDecimal montoImpuesto;
+
 }

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -89,5 +90,18 @@ public class CargaService {
     public Carga obtenerPorId(Long id) {
         return cargaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Carga no encontrada con ID: " + id));
+    }
+
+    public void actualizarImpuestoYEstado(Long id, BigDecimal impuesto, com.aduanas.comex.cargams.enums.EstadoCarga nuevoEstado) {
+        // 1. Buscar la carga en tu base de datos. Si no existe, lanza un error.
+        Carga carga = cargaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró la carga con ID: " + id));
+
+        // 2. Modificar los valores con los setters correspondientes de tu entidad Carga
+        carga.setMontoImpuesto(impuesto);
+        carga.setEstado(nuevoEstado); // ¡Ahora sí compilará porque ambos son EstadoCarga!
+
+        // 3. Guardar los cambios en MySQL
+        cargaRepository.save(carga);
     }
 }
