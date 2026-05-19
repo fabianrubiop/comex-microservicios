@@ -1,7 +1,6 @@
 package com.aduanas.com.pagosms.dto;
 
-import com.aduanas.com.pagosms.entity.EstadoPago;
-import jakarta.validation.constraints.NotBlank;
+import com.aduanas.com.pagosms.Enum.EstadoPago;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,10 +13,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 
-public class PagoResponseDTO {
+public class PagoResponseDto {
+
     private Long pagoId;
     private Long cargaId;
-    private BigDecimal monto;
+    private String tramoAplicado;
+    private String cargoAdministrativo;
+    private BigDecimal impuestoIva;
+    private BigDecimal totalAPagar;
     private String moneda;
     private EstadoPago estadoPago;
     private String transaccionExternaId;

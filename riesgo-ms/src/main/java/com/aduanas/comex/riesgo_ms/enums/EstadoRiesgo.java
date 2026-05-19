@@ -4,5 +4,6 @@ public enum EstadoRiesgo {
 
     PENDIENTE,
     EN_REVISION,
-    RESUELTO
+    APROBADO,
+    RECHAZADO
 }

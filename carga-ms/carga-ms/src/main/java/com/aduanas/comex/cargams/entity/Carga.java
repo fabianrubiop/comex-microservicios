@@ -20,7 +20,8 @@ public class Carga {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cargaId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "numero_declaracion", nullable = false, unique = true, length = 50)
     private String nroDeclaracion;
@@ -34,9 +35,13 @@ public class Carga {
     @Column(name = "valor_declarado", nullable = false, precision = 15, scale = 2)
     private BigDecimal valorDeclarado;
 
-    @Column(name = "rut_importador", nullable = false, length = 12)
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal peso;
+
+    @Column(name = "importador_rut", nullable = false, length = 12)
     private String importadorRut;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 30)
     private EstadoCarga estado;
 
