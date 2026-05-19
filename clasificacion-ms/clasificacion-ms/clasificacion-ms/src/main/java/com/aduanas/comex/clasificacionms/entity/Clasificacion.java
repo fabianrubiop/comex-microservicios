@@ -38,4 +38,8 @@ public class Clasificacion {
 
     @Column(name = "fecha_evaluacion", nullable = false)
     private LocalDateTime fechaEvaluacion;
+
+    @Enumerated(EnumType.STRING)
+    private TipoClasificacion tipo;
+
 }

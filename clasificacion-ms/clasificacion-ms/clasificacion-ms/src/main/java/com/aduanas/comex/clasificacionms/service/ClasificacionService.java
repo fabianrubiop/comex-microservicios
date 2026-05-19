@@ -2,6 +2,9 @@ package com.aduanas.comex.clasificacionms.service;
 
 
 import com.aduanas.comex.clasificacionms.client.CargaClient;
+import com.aduanas.comex.clasificacionms.client.DocumentoClient;
+import com.aduanas.comex.clasificacionms.client.NotificacionClient;
+import com.aduanas.comex.clasificacionms.client.PagoClient;
 import com.aduanas.comex.clasificacionms.dto.ClasificacionResponseDTO;
 import com.aduanas.comex.clasificacionms.dto.EvaluarClasificacionRequestDTO;
 import com.aduanas.comex.clasificacionms.entity.Clasificacion;
@@ -9,9 +12,9 @@ import com.aduanas.comex.clasificacionms.enums.TipoClasificacion;
 import com.aduanas.comex.clasificacionms.repository.ClasificacionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,34 +23,56 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ClasificacionService {
 
+    // 1. Repositorio Local (Para guardar en la BD de clasificación)
     private final ClasificacionRepository clasificacionRepository;
+
+    // 2. Clientes Feign (Los puentes síncronos HTTP hacia los otros microservicios)
     private final CargaClient cargaClient;
+    private final DocumentoClient documentoClient;
+    private final PagoClient pagoClient;
+    private final NotificacionClient notificacionClient;
 
-    public Clasificacion clasificarMercaderia(Long cargaId, BigDecimal valorDeclarado, String observaciones, TipoClasificacion tipo) {
+    @Transactional(rollbackFor = Exception.class) // Usamos el de Spring para asegurar la transacción
+    public Clasificacion clasificarMercaderia(Long cargaId, BigDecimal valorDeclarado, String observaciones, TipoClasificacion tipo, String emailUsuario) {
 
-        // 1. Calcular el 19% de IVA
-        BigDecimal tasaIva = new BigDecimal("0.19");
-        BigDecimal impuestoCalculado = valorDeclarado.multiply(tasaIva).setScale(2, RoundingMode.HALF_UP);
+        // =========================================================================
+        // PASO 1: Lógica de Negocio Local (Calcular el 19% de IVA Chileno)
+        // =========================================================================
+        BigDecimal impuestoCalculado = valorDeclarado.multiply(new BigDecimal("0.19"));
 
-        // 2. Construir la entidad usando el @Builder que tienes en tu clase
-        Clasificacion clasificacion = Clasificacion.builder()
-                .cargaId(cargaId)
-                .tipoClasificacion(tipo) // Usa tu Enum
-                .permitido(true)         // Por defecto permitido, o añade tu lógica
-                .montoImpuesto(impuestoCalculado)
-                .observaciones(observaciones)
-                .fechaEvaluacion(LocalDateTime.now()) // Tu campo real
-                .build();
+        // Guardar el registro en la tabla 'clasificaciones' de Laragon
+        Clasificacion clasificacion = new Clasificacion();
+        clasificacion.setCargaId(cargaId);
+        clasificacion.setMontoImpuesto(impuestoCalculado);
+        clasificacion.setObservaciones(observaciones);
+        clasificacion.setTipo(tipo); // ¡Aquí ya no marcará rojo si @Data está en la entidad!
 
         Clasificacion guardada = clasificacionRepository.save(clasificacion);
 
-        // 3. Notificar a tu microservicio de cargas
-        try {
-            cargaClient.asignarImpuestoYEstado(cargaId, impuestoCalculado, "CLASIFICADA");
-        } catch (Exception e) {
-            System.out.println("Error al notificar al microservicio de Cargas: " + e.getMessage());
-        }
+        // =========================================================================
+        // PASO 2: Comunicación Síncrona (Feign) -> Tienen que completarse sí o sí
+        // =========================================================================
 
+        // Le avisa a Cargas que guarde el impuesto y cambie a "CLASIFICADA"
+        cargaClient.actualizarImpuestoYEstado(cargaId, impuestoCalculado, "CLASIFICADA");
+
+        // Le avisa a Documentos que genere la Declaración de Ingreso (DIN)
+        documentoClient.generarDeclaracionIngreso(cargaId, impuestoCalculado, "12345678-9");
+
+        // Le avisa a Pagos que genere la orden de cobro financiera
+        pagoClient.crearOrdenDePago(cargaId, impuestoCalculado);
+
+        // =========================================================================
+        // PASO 3: Comunicación Asíncrona (Liberación de hilo en Notificaciones)
+        // =========================================================================
+        // Se dispara la petición HTTP por Feign, pero el controlador de destino
+        // responde un 200 OK de inmediato liberando este flujo, mientras manda el mail en segundo plano.
+        notificacionClient.enviarNotificacionClasificacion(
+                emailUsuario,
+                "Tu carga N° " + cargaId + " ha sido clasificada. Total impuesto a pagar: $" + impuestoCalculado
+        );
+
+        // Retornamos la clasificación guardada localmente
         return guardada;
     }
 
