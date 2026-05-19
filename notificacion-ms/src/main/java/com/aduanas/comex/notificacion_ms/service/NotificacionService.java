@@ -7,12 +7,14 @@ import com.aduanas.comex.notificacion_ms.enums.EstadoNotificacion;
 import com.aduanas.comex.notificacion_ms.enums.TipoNotificacion;
 import com.aduanas.comex.notificacion_ms.repository.NotificacionRepository;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+
 public class NotificacionService {
 
     private final NotificacionRepository repository;
@@ -79,6 +81,7 @@ public class NotificacionService {
         return convertirResponseDTO(entity);
     }
 
+
     // BUSCAR POR ESTADO
     public List<NotificacionResponseDTO>
     buscarPorEstado(String estado) {
@@ -106,22 +109,10 @@ public class NotificacionService {
                                         "Notificación no encontrada"
                                 ));
 
-        entity.setMensaje(
-                dto.getMensaje()
-        );
-
-        entity.setDestinatario(
-                dto.getDestinatario()
-        );
-
-        entity.setTipo(
-                TipoNotificacion.valueOf(dto.getTipo())
-        );
-
-        entity.setEstado(
-                EstadoNotificacion.valueOf(dto.getEstado())
-        );
-
+        entity.setMensaje(dto.getMensaje());
+        entity.setDestinatario(dto.getDestinatario());
+        entity.setTipo(TipoNotificacion.valueOf(dto.getTipo()));
+        entity.setEstado(EstadoNotificacion.valueOf(dto.getEstado()));
         Notificacion actualizada =
                 repository.save(entity);
 
@@ -155,4 +146,25 @@ public class NotificacionService {
                 .fecha(entity.getFecha())
                 .build();
     }
+
+    @Async // Le dice a Spring que corra esto en un hilo de fondo
+    public void enviarEmailAsincrono(String email, String mensaje) {
+        try {
+            System.out.println("==== HILO EN SEGUNDO PLANO ENTRANTE ====");
+            System.out.println("Preparando entorno de correo para: " + email);
+
+            // Simulamos la lentitud del servidor de correos (Gmail/Outlook) demorando 3 segundos
+            Thread.sleep(3000);
+
+            System.out.println("Notificación enviada con éxito: " + mensaje);
+            System.out.println("========================================");
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Error en el hilo secundario: " + e.getMessage());
+        }
+    }
+
+
+
 }

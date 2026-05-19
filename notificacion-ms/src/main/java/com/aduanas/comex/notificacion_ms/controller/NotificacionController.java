@@ -6,21 +6,18 @@ import com.aduanas.comex.notificacion_ms.service.NotificacionService;
 
 import jakarta.validation.Valid;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/notificaciones")
+@RequiredArgsConstructor
 public class NotificacionController {
 
-    private final NotificacionService service;
-
-    public NotificacionController(
-            NotificacionService service
-    ) {
-        this.service = service;
-    }
+    private final NotificacionService notificacionService;
 
     // CREAR NOTIFICACIÓN
     @PostMapping
@@ -30,14 +27,14 @@ public class NotificacionController {
             NotificacionRequestDTO dto
     ) {
 
-        return service.crear(dto);
+        return notificacionService.crear(dto);
     }
 
     // LISTAR TODAS LAS NOTIFICACIONES
     @GetMapping
     public List<NotificacionResponseDTO> listar() {
 
-        return service.listar();
+        return notificacionService.listar();
     }
 
     // BUSCAR POR ID
@@ -46,7 +43,7 @@ public class NotificacionController {
             @PathVariable Long id
     ) {
 
-        return service.buscarPorId(id);
+        return notificacionService.buscarPorId(id);
     }
 
     // BUSCAR POR ESTADO
@@ -56,7 +53,7 @@ public class NotificacionController {
             @PathVariable String estado
     ) {
 
-        return service.buscarPorEstado(estado);
+        return notificacionService.buscarPorEstado(estado);
     }
 
     // ACTUALIZAR NOTIFICACIÓN
@@ -69,7 +66,7 @@ public class NotificacionController {
             NotificacionRequestDTO dto
     ) {
 
-        return service.actualizar(id, dto);
+        return notificacionService.actualizar(id, dto);
     }
 
     // ELIMINAR NOTIFICACIÓN
@@ -78,6 +75,16 @@ public class NotificacionController {
             @PathVariable Long id
     ) {
 
-        service.eliminar(id);
+        notificacionService.eliminar(id);
+    }
+
+    @PostMapping("/enviar-alerta")
+    public ResponseEntity<String> recibirAlerta(@RequestParam String email, @RequestParam String mensaje) {
+
+        // Llama al servicio as铆ncrono (no se queda esperando el resultado)
+        notificacionService.enviarEmailAsincrono(email, mensaje);
+
+        // Retorna inmediatamente un 200 OK a Clasificaci贸n
+        return ResponseEntity.ok("Notificaci贸n recibida y proces谩ndose en segundo plano.");
     }
 }
