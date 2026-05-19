@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0a4764be-67af-452c-ace5-b8aedca56f68" name="Changes" comment="se agrego Clasificacion y ClasificacionService,&#10;se implementaron clientes Feign en Clasificacion">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/carga-ms-20260513T215608Z-3-001.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev-clasificaciones" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;fabianrubiop&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/fabianrubiop/comex-microservicios.git&quot;,
+    &quot;accountId&quot;: &quot;5c62a435-7963-49e5-a453-d075c5823ade&quot;
+  },
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
+    },
+    &quot;owner&quot;: &quot;fabianrubiop&quot;,
+    &quot;repository&quot;: &quot;comex-microservicios&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="3DsAKMirkWtI9zqPDBRQtm1m4yC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CargaMsApplication.executor": "Run",
+    "Application.ClasificacionMsApplication.executor": "Run",
+    "Maven.clasificacion-ms [clean].executor": "Run",
+    "Maven.clasificacion-ms [compile].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "dev-cargas",
+    "kotlin-language-version-configured": "true",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Fabian\Downloads\proyectos fs1\comex-microservicios1\clasificacion-ms\clasificacion-ms\clasificacion-ms\src" />
+      <recent name="C:\Users\Fabian\Downloads\proyectos fs1\comex-microservicios1\clasificacion-ms\clasificacion-ms\clasificacion-ms\src\main\resources" />
+      <recent name="C:\Users\Fabian\Downloads\proyectos fs1\comex-microservicios1\clasificacion-ms\clasificacion-ms\clasificacion-ms" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.aduanas.comex.clasificacionms" />
+    </key>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0a4764be-67af-452c-ace5-b8aedca56f68" name="Changes" comment="" />
+      <created>1779060338139</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779060338139</updated>
+    </task>
+    <task id="LOCAL-00001" summary="implementacion corregida de cargas-ms, agrega V2__add_peso_to_cargas.sql para permitir comunicacion entre carga-ms y pagos-ms">
+      <option name="closed" value="true" />
+      <created>1779064204262</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1779064204262</updated>
+    </task>
+    <task id="LOCAL-00002" summary="modificaciones a controller, client y carga (rutas y nombres de atributos)">
+      <option name="closed" value="true" />
+      <created>1779076616150</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1779076616150</updated>
+    </task>
+    <task id="LOCAL-00003" summary="modificaciones a paquetes del modulo carga y clasificacion">
+      <option name="closed" value="true" />
+      <created>1779209239133</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1779209239133</updated>
+    </task>
+    <task id="LOCAL-00004" summary="se agrego Clasificacion y ClasificacionService,&#10;se implementaron clientes Feign en Clasificacion">
+      <option name="closed" value="true" />
+      <created>1779224492051</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1779224492051</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="implementacion corregida de cargas-ms, agrega V2__add_peso_to_cargas.sql para permitir comunicacion entre carga-ms y pagos-ms" />
+    <MESSAGE value="modificaciones a controller, client y carga (rutas y nombres de atributos)" />
+    <MESSAGE value="modificaciones a paquetes del modulo carga y clasificacion" />
+    <MESSAGE value="se agrego Clasificacion y ClasificacionService,&#10;se implementaron clientes Feign en Clasificacion" />
+    <option name="LAST_COMMIT_MESSAGE" value="se agrego Clasificacion y ClasificacionService,&#10;se implementaron clientes Feign en Clasificacion" />
+  </component>
+</project>
