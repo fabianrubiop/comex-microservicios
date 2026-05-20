@@ -2,6 +2,7 @@ package com.aduanas.comex.riesgo_ms.service;
 
 
 
+import com.aduanas.comex.riesgo_ms.client.CargaClient;
 import com.aduanas.comex.riesgo_ms.dto.RiesgoRequestDTO;
 import com.aduanas.comex.riesgo_ms.dto.RiesgoResponseDTO;
 import com.aduanas.comex.riesgo_ms.entity.Riesgo;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 public class RiesgoService {
 
     private final RiesgoRepository repository;
+
+    private final CargaClient cargaClient;
 
 
     public RiesgoResponseDTO crear(RiesgoRequestDTO dto) {
