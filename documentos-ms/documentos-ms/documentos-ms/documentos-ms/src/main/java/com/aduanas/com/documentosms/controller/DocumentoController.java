@@ -38,7 +38,7 @@ public class DocumentoController {
     }
 
     // ==========================================
-    // PUT: ANALISTA REVISA DOCUMENTO (FLUJO 2)
+    // PUT: ANALISTA REVISA DOCUMENTO
     // ==========================================
     @PutMapping("/analista/{id}")
     public ResponseEntity<DocumentoResponseAnalistaDTO> analistaRevisaDocumento(

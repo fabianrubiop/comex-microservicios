@@ -1,6 +1,6 @@
 package com.aduanas.com.documentosms.dto;
 
-import com.aduanas.com.documentosms.entity.EstadoValidacion;
+import com.aduanas.com.documentosms.Enum.EstadoValidacion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
