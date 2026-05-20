@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 
-@FeignClient(name = "carga-ms", url = "http://localhost:8081/api/v1/cargas")
+@FeignClient(name = "carga-ms", url = "http://localhost:8081")
 public interface CargaClient {
     @PutMapping("/{id}/asignar-impuesto")
     void actualizarImpuestoYEstado(
