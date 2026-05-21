@@ -44,7 +44,7 @@ public class CargaService {
         carga = cargaRepository.save(carga);
         log.debug("Carga persistida con éxito de manera local con ID: {}", carga.getId());
 
-        // 2. CORREGIDO: Mapeamos los datos reales que el EvaluarClasificacionRequestDTO exige con @NotNull y @NotBlank
+        // 2. Mapeamos los datos reales para el microservicio de clasificación
         ClasificacionRequestDTO extRequest = ClasificacionRequestDTO.builder()
                 .cargaId(carga.getId())
                 .descripcionMercancia(carga.getDescripcion())
@@ -54,23 +54,19 @@ public class CargaService {
 
         log.info("Llamando de forma síncrona a clasificacion-cumplimiento-ms para Carga ID: {}", carga.getId());
 
-        // 3. Comunicación Inter-servicio vía Feign cruzando el ID en la URL y el body perfecto
+        // 3. Comunicación Inter-servicio vía Feign
         ClasificacionResponseDTO extResponse = clasificacionClient.evaluar(carga.getId(), extRequest);
         log.info("Respuesta recibida desde Clasificación. Permitido: {}", extResponse.getPermitido());
 
-        // 4. Actualizar el estado de la carga de acuerdo a la respuesta del otro MS
-        if (Boolean.TRUE.equals(extResponse.getPermitido())) {
-            carga.setEstado(EstadoCarga.CLASIFICADA);
-        } else {
+        // 4. Dependencia real: Si fue rechazada, lo marcamos. Si fue permitida, recargamos la entidad
+        // para obtener el "PENDIENTE_PAGO" e impuestos reales que el otro MS inyectó en nuestra BD.
+        if (Boolean.FALSE.equals(extResponse.getPermitido())) {
             carga.setEstado(EstadoCarga.RECHAZADA);
+            cargaRepository.save(carga);
+        } else {
+            // Recargamos el registro fresco de la BD (con Arancel + IVA ya calculados)
+            carga = cargaRepository.findById(carga.getId()).orElse(carga);
         }
-
-        // Si el otro servicio te devolvió impuestos calculados, los guardamos de una
-        if (extResponse.getMontoImpuesto() != null) {
-            carga.setMontoImpuesto(extResponse.getMontoImpuesto());
-        }
-
-        cargaRepository.save(carga);
 
         // 5. Construir y retornar el DTO unificado final para Postman
         return CargaResponseDTO.builder()
@@ -83,8 +79,7 @@ public class CargaService {
                 .estado(carga.getEstado().name())
                 .fechaCreacion(carga.getFechaCreacion())
                 .permitido(extResponse.getPermitido())
-                .montoImpuesto(extResponse.getMontoImpuesto() != null ? extResponse.getMontoImpuesto() : BigDecimal.ZERO)
-                // Cambia .getObservations() por .getObservaciones()
+                .montoImpuesto(carga.getMontoImpuesto() != null ? carga.getMontoImpuesto() : BigDecimal.ZERO)
                 .observaciones(extResponse.getObservaciones() != null ? extResponse.getObservaciones() : "Sin observaciones")
                 .build();
     }

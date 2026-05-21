@@ -67,11 +67,14 @@ public class DocumentoService {
             // 🔥 ¡EL COLAZO AUTOMÁTICO HACIA NOTIFICACIÓN!
             try {
                 log.info("Llamando a notificacion-ms para avisar el cambio de estado del documento {}", guardado.getDocumentoId());
-                notificacionFeignClient.enviarNotificacionDocumento(
-                        guardado.getDocumentoId(),
-                        guardado.getEstadoValidacion().name(),
-                        guardado.getObservacionManual()
-                );
+
+                // CORREGIDO: Se adaptaron los argumentos para cumplir con los requerimientos del microservicio de notificaciones
+                String emailSimulado = "analista.aduana@comex.cl";
+                String mensajeAlerta = "Documento ID: " + guardado.getDocumentoId() +
+                        " cambio a Estado: " + guardado.getEstadoValidacion().name() +
+                        ". Obs: " + guardado.getObservacionManual();
+
+                notificacionFeignClient.enviarNotificacionDocumento(emailSimulado, mensajeAlerta);
             } catch (Exception e) {
                 log.error("No se pudo enviar la notificación pero el documento quedó guardado igual: {}", e.getMessage());
             }
