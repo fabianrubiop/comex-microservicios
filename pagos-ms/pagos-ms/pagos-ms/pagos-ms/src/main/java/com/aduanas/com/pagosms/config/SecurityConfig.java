@@ -1,20 +1,13 @@
-package com.aduanas.comex.notificacion_ms.config;
-
-
+package com.aduanas.com.pagosms.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// SECURITY
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
-// FILTRO SEGURIDAD
 import org.springframework.security.web.SecurityFilterChain;
-
 
 @Configuration
 public class SecurityConfig {
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {http
@@ -23,9 +16,6 @@ public class SecurityConfig {
                         auth.anyRequest()
                                 .permitAll()
                 );
-        // ======================================================
-        // CONSTRUIR CONFIG
-        // ======================================================
         return http.build();
     }
 }
