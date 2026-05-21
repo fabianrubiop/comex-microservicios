@@ -6,7 +6,6 @@ public class NotificacionException
     public NotificacionException(
             String mensaje
     ) {
-
         super(mensaje);
     }
 }

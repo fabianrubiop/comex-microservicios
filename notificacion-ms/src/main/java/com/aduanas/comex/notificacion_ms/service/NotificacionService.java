@@ -7,50 +7,31 @@ import com.aduanas.comex.notificacion_ms.enums.EstadoNotificacion;
 import com.aduanas.comex.notificacion_ms.enums.TipoNotificacion;
 import com.aduanas.comex.notificacion_ms.repository.NotificacionRepository;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@RequiredArgsConstructor
 @Service
 
 public class NotificacionService {
 
     private final NotificacionRepository repository;
 
-    public NotificacionService(NotificacionRepository repository) {
-        this.repository = repository;
-    }
 
     // CREAR NOTIFICACIÓN
     public NotificacionResponseDTO crear(
             NotificacionRequestDTO dto
     ) {
-
         Notificacion notificacion =
                 new Notificacion();
-
-        notificacion.setMensaje(
-                dto.getMensaje()
-        );
-
-        notificacion.setDestinatario(
-                dto.getDestinatario()
-        );
-
-        notificacion.setTipo(
-                TipoNotificacion.valueOf(dto.getTipo())
-        );
-
-        notificacion.setEstado(
-                EstadoNotificacion.valueOf(dto.getEstado())
-        );
-
-        notificacion.setFecha(
-                LocalDateTime.now()
-        );
-
+        notificacion.setMensaje(dto.getMensaje());
+        notificacion.setDestinatario(dto.getDestinatario());
+        notificacion.setTipo(TipoNotificacion.valueOf(dto.getTipo()));
+        notificacion.setEstado(EstadoNotificacion.valueOf(dto.getEstado()));
+        notificacion.setFecha(LocalDateTime.now());
         Notificacion guardada =
                 repository.save(notificacion);
 
@@ -86,9 +67,7 @@ public class NotificacionService {
     buscarPorEstado(String estado) {
 
         List<Notificacion> lista =
-                repository.findByestado(
-                        EstadoNotificacion.valueOf(estado)
-                );
+                repository.findByEstado(EstadoNotificacion.valueOf(estado));
 
         return lista.stream()
                 .map(this::convertirResponseDTO)

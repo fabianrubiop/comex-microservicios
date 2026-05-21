@@ -22,14 +22,17 @@ public class RiesgoController {
     }
 
     @GetMapping
-    public List<RiesgoResponseDTO> listar() {return service.listar();
+    public List<RiesgoResponseDTO> listar() {
+        return service.listar();
     }
 
     @GetMapping("/{id}")
-    public RiesgoResponseDTO buscarPorId(@PathVariable Long id) {return service.buscarPorId(id);
+    public RiesgoResponseDTO buscarPorId(@PathVariable Long id) {
+        return service.buscarPorId(id);
     }
     @GetMapping("/canal/{canal}")
-    public List<RiesgoResponseDTO> buscarPorCanal(@PathVariable String canal) {return service.buscarPorCanal(canal);
+    public List<RiesgoResponseDTO> buscarPorCanal(@PathVariable String canal) {
+        return service.buscarPorCanal(canal);
     }
 
     @GetMapping("/carga/{cargaId}")

@@ -1,139 +1,61 @@
 package com.aduanas.comex.riesgo_ms.exception;
 
-// ======================================================
-// ===================== IMPORTS =========================
-// ======================================================
-
-// HTTP STATUS
+// SPRING
 import org.springframework.http.HttpStatus;
-
-// RESPUESTAS HTTP
 import org.springframework.http.ResponseEntity;
-
-// EXCEPCIONES VALIDACIONES DTO
-import org.springframework.web.bind.MethodArgumentNotValidException;
-
-// ANOTACIONES
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-// MAPAS
+// MAPA JSON
 import java.util.HashMap;
 import java.util.Map;
 
-// ======================================================
-// ================= GLOBAL HANDLER ======================
-// ======================================================
-//
-// Captura errores globalmente.
-//
-// Evita errores feos de Spring.
-//
-// Permite personalizar respuestas.
-//
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // ======================================================
-    // ============ VALIDACIONES DTO ========================
+    // MANEJAR RiesgoException
     // ======================================================
     //
-    // Captura errores como:
+    // Cuando ocurra:
+    // throw new RiesgoException(...)
     //
-    // @NotBlank
-    // @Size
-    // @Email
+    // Spring ejecutará automáticamente
+    // este método.
     //
-    @ExceptionHandler(
-            MethodArgumentNotValidException.class
-    )
-
-    public ResponseEntity<
-            Map<String, String>
-            >
-    manejarValidaciones(
-
-            MethodArgumentNotValidException ex
-    ) {
-
-        // ======================================================
-        // MAPA ERRORES
-        // ======================================================
-        //
-        // Guardará:
-        //
-        // campo → mensaje
-        //
-        Map<String, String> errores =
-                new HashMap<>();
-
-        // ======================================================
-        // RECORRER ERRORES
-        // ======================================================
-        ex.getBindingResult()
-
-                .getFieldErrors()
-
-                .forEach(error ->
-
-                        errores.put(
-                                // nombre campo
-                                error.getField(),
-                                // mensaje validación
-                                error.getDefaultMessage()
-                        )
-                );
-
-        // ======================================================
-        // RESPONSE 400
-        // ======================================================
-        return new ResponseEntity<>(
-
-                errores,
-
-                HttpStatus.BAD_REQUEST
-        );
-    }
-
-    // ======================================================
-    // ============ EXCEPCIÓN PERSONALIZADA =================
-    // ======================================================
-    //
-    // Captura:
-    //
-    // RiesgoException
-    //
-    @ExceptionHandler(
-            RiesgoException.class
-    )
-
-    public ResponseEntity<String>
-    manejarRiesgoException(
+    @ExceptionHandler(RiesgoException.class)
+    public ResponseEntity<Map<String, String>> manejarRiesgoException(
 
             RiesgoException ex
     ) {
 
-        return new ResponseEntity<>(
+        // ==========================================
+        // CREAR RESPUESTA JSON
+        // ==========================================
+        Map<String, String> error = new HashMap<>();
+        error.put("mensaje", ex.getMessage());
 
-                // mensaje error
-                ex.getMessage(),
-
-                // HTTP 400
-                HttpStatus.BAD_REQUEST);
+        // ==========================================
+        // RETORNAR ERROR 404
+        // ==========================================
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     // ======================================================
-    // ================= ERROR GENERAL ======================
+    // MANEJAR ERRORES GENERALES
     // ======================================================
     //
-    // Captura cualquier error inesperado.
+    // Captura cualquier otro error.
     //
     @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> manejarException(
+            Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put(
+                "mensaje",
+                "Error interno del servidor"
+        );
 
-    public ResponseEntity<String> manejarGeneral(Exception ex) {
-
-        return new ResponseEntity<>(
-                "Error interno del servidor",
-                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
