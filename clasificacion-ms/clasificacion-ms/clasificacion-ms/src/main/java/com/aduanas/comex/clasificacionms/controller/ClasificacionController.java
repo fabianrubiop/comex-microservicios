@@ -35,9 +35,21 @@ public class ClasificacionController {
         return ResponseEntity.ok(clasificacionService.obtenerPorId(id));
     }
 
+    // GET: http://localhost:8082/api/clasificaciones/cargas/%7BcargaId%7D
+    @GetMapping("/cargas/{cargaId}")
+    public ResponseEntity<ClasificacionResponseDTO> obtenerPorCargaId(@PathVariable Long cargaId) {
+        return ResponseEntity.ok(clasificacionService.obtenerPorCargaId(cargaId));
+    }
 
-    //Sirve para: Traer un listado completo con el historial de todas las clasificaciones de aduana que se han hecho en el sistema.
-    //Por qué importa: Te devuelve una lista de ClasificacionResponseDTO, lo que significa que cuando tires este GET en Postman,
-    // vas a ver todas las cargas evaluadas con sus respectivos montos de impuesto, observaciones y si fueron permitidas o no.
-    // Es ideal para que un administrador vea el panorama completo.
+    @PutMapping("/{cargaId}/liberar")
+    public ResponseEntity<Void> actualizarEstadoLiberacion(
+            @PathVariable Long cargaId,
+            @RequestParam String estadoAduanero) {
+
+        // Aquí ellos buscan la clasificación y le cambian el estado en su base de datos
+        System.out.println("¡Alerta Pagos! Cambiando carga " + cargaId + " a estado: " + estadoAduanero);
+
+        return ResponseEntity.ok().build();
+    }
+
 }
