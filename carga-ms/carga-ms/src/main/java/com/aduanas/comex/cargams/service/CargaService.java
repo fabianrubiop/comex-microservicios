@@ -1,6 +1,5 @@
 package com.aduanas.comex.cargams.service;
 
-
 import com.aduanas.comex.cargams.client.ClasificacionClient;
 import com.aduanas.comex.cargams.dto.CargaResponseDTO;
 import com.aduanas.comex.cargams.dto.CrearCargaRequestDTO;
@@ -45,7 +44,7 @@ public class CargaService {
         carga = cargaRepository.save(carga);
         log.debug("Carga persistida con éxito de manera local con ID: {}", carga.getId());
 
-        // 2. Preparar la petición para el Microservicio de Clasificación
+        // 2. CORREGIDO: Mapeamos los datos reales que el EvaluarClasificacionRequestDTO exige con @NotNull y @NotBlank
         ClasificacionRequestDTO extRequest = ClasificacionRequestDTO.builder()
                 .cargaId(carga.getId())
                 .descripcionMercancia(carga.getDescripcion())
@@ -55,8 +54,8 @@ public class CargaService {
 
         log.info("Llamando de forma síncrona a clasificacion-cumplimiento-ms para Carga ID: {}", carga.getId());
 
-        // 3. Comunicación Inter-servicio vía Feign
-        ClasificacionResponseDTO extResponse = clasificacionClient.evaluar(extRequest);
+        // 3. Comunicación Inter-servicio vía Feign cruzando el ID en la URL y el body perfecto
+        ClasificacionResponseDTO extResponse = clasificacionClient.evaluar(carga.getId(), extRequest);
         log.info("Respuesta recibida desde Clasificación. Permitido: {}", extResponse.getPermitido());
 
         // 4. Actualizar el estado de la carga de acuerdo a la respuesta del otro MS
@@ -65,9 +64,15 @@ public class CargaService {
         } else {
             carga.setEstado(EstadoCarga.RECHAZADA);
         }
+
+        // Si el otro servicio te devolvió impuestos calculados, los guardamos de una
+        if (extResponse.getMontoImpuesto() != null) {
+            carga.setMontoImpuesto(extResponse.getMontoImpuesto());
+        }
+
         cargaRepository.save(carga);
 
-        // 5. Construir y retornar el DTO unificado final
+        // 5. Construir y retornar el DTO unificado final para Postman
         return CargaResponseDTO.builder()
                 .id(carga.getId())
                 .numeroDeclaracion(carga.getNroDeclaracion())
@@ -78,8 +83,9 @@ public class CargaService {
                 .estado(carga.getEstado().name())
                 .fechaCreacion(carga.getFechaCreacion())
                 .permitido(extResponse.getPermitido())
-                .montoImpuesto(extResponse.getMontoImpuesto())
-                .observaciones(extResponse.getObservaciones())
+                .montoImpuesto(extResponse.getMontoImpuesto() != null ? extResponse.getMontoImpuesto() : BigDecimal.ZERO)
+                // Cambia .getObservations() por .getObservaciones()
+                .observaciones(extResponse.getObservaciones() != null ? extResponse.getObservaciones() : "Sin observaciones")
                 .build();
     }
 
@@ -93,15 +99,12 @@ public class CargaService {
     }
 
     public void actualizarImpuestoYEstado(Long id, BigDecimal impuesto, com.aduanas.comex.cargams.enums.EstadoCarga nuevoEstado) {
-        // 1. Buscar la carga en tu base de datos. Si no existe, lanza un error.
         Carga carga = cargaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No se encontró la carga con ID: " + id));
 
-        // 2. Modificar los valores con los setters correspondientes de tu entidad Carga
         carga.setMontoImpuesto(impuesto);
-        carga.setEstado(nuevoEstado); // ¡Ahora sí compilará porque ambos son EstadoCarga!
+        carga.setEstado(nuevoEstado);
 
-        // 3. Guardar los cambios en MySQL
         cargaRepository.save(carga);
     }
 }

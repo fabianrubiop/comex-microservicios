@@ -9,7 +9,7 @@ package com.aduana.bancoms.client;
     @FeignClient(name = "pagos-ms", url = "http://localhost:8083/api/pagos")
     public interface PagoFeignClient {
 
-    // Le pega al endpoint receptor de tu módulo de pagos
-    @PostMapping("/confirmar-banco")
-    void enviarConfirmacionAlMicroservicioPagos(@RequestBody NotificacionBancoDto dto);
+        // CORREGIDO: Cambiado para que apunte al endpoint real de tu PagoController
+        @PostMapping("/notificacion-banco")
+        void enviarConfirmacionAlMicroservicioPagos(@RequestBody NotificacionBancoDto dto);
 }

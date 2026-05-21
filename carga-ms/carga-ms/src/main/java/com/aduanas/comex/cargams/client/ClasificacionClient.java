@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "clasificacion-ms", url = "http://localhost:8082")
 public interface ClasificacionClient {
 
-    @PostMapping("/api/v1/clasificaciones/evaluar")
-    ClasificacionResponseDTO evaluar(@RequestBody ClasificacionRequestDTO request);
+    // CORREGIDO: Ahora incluye /{cargaId} en la URL y el @PathVariable para enlazarlo
+    @PostMapping("/api/v1/clasificaciones/evaluar/{cargaId}")
+    ClasificacionResponseDTO evaluar(
+            @PathVariable("cargaId") Long cargaId,
+            @RequestBody ClasificacionRequestDTO request
+    );
 
-    @GetMapping("/api/v1/clasificaciones/{id}") // 2. La ruta exacta con su variable
+    @GetMapping("/api/v1/clasificaciones/{id}")
     ResponseEntity<ClasificacionResponseDTO> obtenerClasificacionPorId(@PathVariable("id") Long id);
-
-
 }

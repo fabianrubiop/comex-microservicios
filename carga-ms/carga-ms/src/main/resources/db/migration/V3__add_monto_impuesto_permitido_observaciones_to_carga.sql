@@ -1,0 +1,3 @@
+ALTER TABLE cargas ADD COLUMN monto_impuesto DECIMAL(15,2) NULL;
+ALTER TABLE cargas ADD COLUMN permitido TINYINT(1) NULL;
+ALTER TABLE cargas ADD COLUMN observaciones VARCHAR(255) NULL;

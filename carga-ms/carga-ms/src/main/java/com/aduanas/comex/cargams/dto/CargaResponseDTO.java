@@ -1,5 +1,6 @@
 package com.aduanas.comex.cargams.dto;
 
+import jakarta.persistence.Transient;
 import lombok.Builder;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -19,7 +20,11 @@ public class CargaResponseDTO {
     private LocalDateTime fechaCreacion;
 
     // Datos cruzados agregados dinámicamente desde clasificacion-ms
+
+    @Transient
     private Boolean permitido;
+    @Transient
     private BigDecimal montoImpuesto;
+    @Transient
     private String observaciones;
 }
