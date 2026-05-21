@@ -24,9 +24,6 @@ public class RiesgoException extends RuntimeException {
     // Recibe mensaje error.
     //
     public RiesgoException(String mensaje) {
-        // super()
-        // envía el mensaje
-        // a RuntimeException
         super(mensaje);
     }
 }

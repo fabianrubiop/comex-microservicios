@@ -1,82 +1,63 @@
 package com.aduanas.comex.notificacion_ms.exception;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // ======================================================
     // ERROR PERSONALIZADO
-    @ExceptionHandler(
-            NotificacionException.class
-    )
-    public ResponseEntity<Map<String, Object>>
-    manejarNotificacionException(
-            NotificacionException ex
-    ) {
+    // ======================================================
+    //
+    // Maneja:
+    // throw new NotificacionException(...)
+    //
+    @ExceptionHandler(NotificacionException.class)
+    public ResponseEntity<Map<String, String>> manejarNotificacionException(NotificacionException ex) {
 
-        Map<String, Object> error =
+        // ==========================================
+        // CREAR JSON ERROR
+        // ==========================================
+        Map<String, String> error =
                 new HashMap<>();
-
+        // ==========================================
+        // MENSAJE ERROR
+        // ==========================================
         error.put(
                 "mensaje",
                 ex.getMessage()
         );
 
-        error.put(
-                "status",
-                404
-        );
-
-        error.put(
-                "fecha",
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(error);
+        // ==========================================
+        // RETORNAR ERROR 404
+        // ==========================================
+        return new ResponseEntity<>
+                (error, HttpStatus.NOT_FOUND);
     }
 
-    // ERROR VALIDACIONES DTO
-    @ExceptionHandler(
-            MethodArgumentNotValidException.class
-    )
-    public ResponseEntity<Map<String, Object>>
-    manejarValidaciones(
-            MethodArgumentNotValidException ex
-    ) {
-
-        Map<String, Object> error =
+    // ======================================================
+    // ERROR GENERAL
+    // ======================================================
+    //
+    // Captura cualquier otro error.
+    //
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> manejarException(Exception ex) {
+        Map<String, String> error =
                 new HashMap<>();
-
         error.put(
                 "mensaje",
-                "Error de validación"
+                "Error interno del servidor"
         );
 
-        error.put(
-                "detalle",
-                ex.getBindingResult()
-                        .getFieldError()
-                        .getDefaultMessage()
+        return new ResponseEntity<>
+                (error, HttpStatus.INTERNAL_SERVER_ERROR
         );
-
-        error.put(
-                "status",
-                400
-        );
-
-        return ResponseEntity
-                .badRequest()
-                .body(error);
     }
 }

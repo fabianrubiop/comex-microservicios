@@ -11,6 +11,6 @@ import java.util.List;
 
 public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
 
-    List<Notificacion> findByestado(EstadoNotificacion estado);
+    List<Notificacion> findByEstado(EstadoNotificacion estado);
 
 }
