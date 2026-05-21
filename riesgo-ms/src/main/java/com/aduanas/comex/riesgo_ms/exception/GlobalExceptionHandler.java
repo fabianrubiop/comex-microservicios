@@ -51,10 +51,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> manejarException(
             Exception ex) {
         Map<String, String> error = new HashMap<>();
-        error.put(
-                "mensaje",
-                "Error interno del servidor"
-        );
+        error.put("mensaje", "Error interno del servidor");
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
