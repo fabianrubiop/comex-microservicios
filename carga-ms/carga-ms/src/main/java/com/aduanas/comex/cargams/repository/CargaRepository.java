@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CargaRepository extends JpaRepository<Carga, Long> {
+    //// Ya incluye por defecto: save(), findById(), findAll(), deleteById()
 }
