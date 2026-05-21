@@ -25,11 +25,13 @@ public class CargaService {
     private final CargaRepository cargaRepository;
     private final ClasificacionClient clasificacionClient;
 
+    /**
+     * 1. Sub-método auxiliar con @Transactional.
+     * Guarda la carga inicial en la base de datos y hace COMMIT de inmediato al terminar,
+     * liberando los bloqueos de tablas antes de que hagamos la llamada por red (Feign).
+     */
     @Transactional
-    public CargaResponseDTO crear(CrearCargaRequestDTO dto) {
-        log.info("Iniciando registro de nueva carga: {}", dto.getNumeroDeclaracion());
-
-        // 1. Guardar la entidad en nuestra propia base de datos local
+    public Carga guardarCargaInicial(CrearCargaRequestDTO dto) {
         Carga carga = Carga.builder()
                 .nroDeclaracion(dto.getNumeroDeclaracion())
                 .descripcion(dto.getDescripcion())
@@ -41,10 +43,22 @@ public class CargaService {
                 .fechaCreacion(LocalDateTime.now())
                 .build();
 
-        carga = cargaRepository.save(carga);
+        return cargaRepository.save(carga);
+    }
+
+    /**
+     * 2. Método principal del servicio.
+     * NOTA: Aquí quitamos el @Transactional para que la comunicación inter-servicio
+     * vía Feign ocurra FUERA de un contexto transaccional bloqueante.
+     */
+    public CargaResponseDTO crear(CrearCargaRequestDTO dto) {
+        log.info("Iniciando registro de nueva carga: {}", dto.getNumeroDeclaracion());
+
+        // PASO A: Persistir localmente y liberar la transacción inmediatamente
+        Carga carga = guardarCargaInicial(dto);
         log.debug("Carga persistida con éxito de manera local con ID: {}", carga.getId());
 
-        // 2. Mapeamos los datos reales para el microservicio de clasificación
+        // PASO B: Mapear datos reales para el microservicio externo de clasificación
         ClasificacionRequestDTO extRequest = ClasificacionRequestDTO.builder()
                 .cargaId(carga.getId())
                 .descripcionMercancia(carga.getDescripcion())
@@ -54,21 +68,21 @@ public class CargaService {
 
         log.info("Llamando de forma síncrona a clasificacion-cumplimiento-ms para Carga ID: {}", carga.getId());
 
-        // 3. Comunicación Inter-servicio vía Feign
+        // PASO C: Comunicación Feign segura.
+        // Clasificación podrá invocar a 'actualizarImpuestoYEstado' sin sufrir bloqueos en la BD (Deadlock).
         ClasificacionResponseDTO extResponse = clasificacionClient.evaluar(carga.getId(), extRequest);
         log.info("Respuesta recibida desde Clasificación. Permitido: {}", extResponse.getPermitido());
 
-        // 4. Dependencia real: Si fue rechazada, lo marcamos. Si fue permitida, recargamos la entidad
-        // para obtener el "PENDIENTE_PAGO" e impuestos reales que el otro MS inyectó en nuestra BD.
+        // PASO D: Volver a leer la entidad fresca desde la BD (ya modificada por Clasificación con sus impuestos)
+        carga = obtenerPorId(carga.getId());
+
+        // Si fue rechazada externamente, actualizamos el estado de manera aislada
         if (Boolean.FALSE.equals(extResponse.getPermitido())) {
+            actualizarEstadoRechazado(carga.getId());
             carga.setEstado(EstadoCarga.RECHAZADA);
-            cargaRepository.save(carga);
-        } else {
-            // Recargamos el registro fresco de la BD (con Arancel + IVA ya calculados)
-            carga = cargaRepository.findById(carga.getId()).orElse(carga);
         }
 
-        // 5. Construir y retornar el DTO unificado final para Postman
+        // PASO E: Construir y retornar el DTO unificado final para Postman
         return CargaResponseDTO.builder()
                 .id(carga.getId())
                 .numeroDeclaracion(carga.getNroDeclaracion())
@@ -84,6 +98,17 @@ public class CargaService {
                 .build();
     }
 
+    /**
+     * Sub-método auxiliar para aislar transaccionalmente la actualización por rechazo
+     */
+    @Transactional
+    public void actualizarEstadoRechazado(Long id) {
+        cargaRepository.findById(id).ifPresent(c -> {
+            c.setEstado(EstadoCarga.RECHAZADA);
+            cargaRepository.save(c);
+        });
+    }
+
     public List<Carga> listar() {
         return cargaRepository.findAll();
     }
@@ -93,7 +118,8 @@ public class CargaService {
                 .orElseThrow(() -> new RuntimeException("Carga no encontrada con ID: " + id));
     }
 
-    public void actualizarImpuestoYEstado(Long id, BigDecimal impuesto, com.aduanas.comex.cargams.enums.EstadoCarga nuevoEstado) {
+    @Transactional
+    public void actualizarImpuestoYEstado(Long id, BigDecimal impuesto, EstadoCarga nuevoEstado) {
         Carga carga = cargaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No se encontró la carga con ID: " + id));
 

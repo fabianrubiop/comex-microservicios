@@ -2,14 +2,11 @@ package com.aduana.bancoms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.EnableFeignClients; // <-- Este import se agregará solo o ponlo tú
 
-// CORREGIDO: Se remueve el "exclude" de DataSourceAutoConfiguration ya que este microservicio
-// no tiene dependencias de BD instaladas en su pom.xml. Spring Boot iniciará limpio por defecto.
+@EnableFeignClients // <--- ¡AQUÍ ESTÁ EL TRUCO, AGREGA ESTO!
 @SpringBootApplication
-@EnableFeignClients
 public class BancoMsApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(BancoMsApplication.class, args);
     }
