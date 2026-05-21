@@ -25,15 +25,13 @@ public class NotificacionService {
     public NotificacionResponseDTO crear(
             NotificacionRequestDTO dto
     ) {
-        Notificacion notificacion =
-                new Notificacion();
+        Notificacion notificacion = new Notificacion();
         notificacion.setMensaje(dto.getMensaje());
         notificacion.setDestinatario(dto.getDestinatario());
         notificacion.setTipo(TipoNotificacion.valueOf(dto.getTipo()));
         notificacion.setEstado(EstadoNotificacion.valueOf(dto.getEstado()));
         notificacion.setFecha(LocalDateTime.now());
-        Notificacion guardada =
-                repository.save(notificacion);
+        Notificacion guardada = repository.save(notificacion);
 
         return convertirResponseDTO(guardada);
     }
@@ -48,16 +46,9 @@ public class NotificacionService {
     }
 
     // BUSCAR NOTIFICACIÓN POR ID
-    public NotificacionResponseDTO buscarPorId(
-            Long id
-    ) {
-
-        Notificacion entity =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Notificación no encontrada"
-                                ));
+    public NotificacionResponseDTO buscarPorId(Long id) {
+        Notificacion entity = repository.findById(id).orElseThrow(() ->
+                new RuntimeException("Notificación no encontrada"));
 
         return convertirResponseDTO(entity);
     }

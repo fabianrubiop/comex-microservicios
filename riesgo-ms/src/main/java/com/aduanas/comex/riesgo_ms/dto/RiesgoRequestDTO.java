@@ -19,7 +19,6 @@ public class RiesgoRequestDTO {
     @NotBlank(message = "El tipo de carga es obligatorio")
     private String tipoCarga;
 
-
     @NotBlank(message = "El origen es obligatorio")
     private String origen;
 
