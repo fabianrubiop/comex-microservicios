@@ -22,6 +22,10 @@ public class DocumentoRequestUsuarioExDTO {
     @NotBlank(message  = "La observaciones no pueden estar vacias")
     private String observacionManual;
 
+    // Agrega esto adentro de tu DocumentoRequestUsuarioExDTO
+    @NotNull(message = "El ID de la carga es obligatorio")
+    private Long cargaId;
+
 
 
 }
