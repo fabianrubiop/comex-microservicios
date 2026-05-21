@@ -113,6 +113,13 @@ public class ClasificacionService {
         return mapToResponse(clasificacion);
     }
 
+    public ClasificacionResponseDTO obtenerPorCargaId(Long cargaId) {
+        Clasificacion clasificacion = clasificacionRepository.findByCargaId(cargaId)
+                .orElseThrow(() -> new RuntimeException("Clasificación no encontrada para la carga: " + cargaId));
+
+        return mapToResponse(clasificacion);
+    }
+
     private ClasificacionResponseDTO mapToResponse(Clasificacion clasificacion) {
         return ClasificacionResponseDTO.builder()
                 .id(clasificacion.getId())
@@ -123,4 +130,6 @@ public class ClasificacionService {
                 .observaciones(clasificacion.getObservaciones())
                 .build();
     }
+
+
 }
