@@ -7,14 +7,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "clasificacion-ms", url = "http://localhost:8082/api/clasificaciones")
+// CORREGIDO: Dejamos la URL base limpia en la raíz del microservicio destino (puerto 8082)
+// para mapear las rutas de forma explícita en cada método sin solapamientos.
+@FeignClient(name = "clasificacion-ms", url = "http://localhost:8082")
 public interface ClasificacionFeignClient {
 
-    @GetMapping("/cargas/{id}")
+    @GetMapping("/api/clasificaciones/cargas/{id}")
     CargaExternaDto obtenerCargaPorId(@PathVariable("id") Long id);
 
-    // ¡AQUÍ ES DONDE VA EL PUT! Pagos es el único que gatilla la liberación en "APROBADO"
-    @PutMapping("/{cargaId}/liberar")
+    @PutMapping("/api/clasificaciones/{cargaId}/liberar")
     void actualizarEstadoLiberacion(
             @PathVariable("cargaId") Long cargaId,
             @RequestParam("estadoAduanero") String estadoAduanero
