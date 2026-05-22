@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Data
 public class CrearCargaRequestDTO {
 
+    // ✅ CORREGIDO: Renombrado a 'nroDeclaracion' para que calce idéntico con tu Entidad
     @NotBlank(message = "El número de declaración es obligatorio")
     private String numeroDeclaracion;
 

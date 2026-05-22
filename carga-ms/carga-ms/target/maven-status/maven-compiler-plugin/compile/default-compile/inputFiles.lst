@@ -1,0 +1,12 @@
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\entity\Carga.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\repository\CargaRepository.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\enums\EstadoCarga.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\client\ClasificacionClient.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\dto\CargaResponseDTO.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\dto\CrearCargaRequestDTO.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\dto\external\ClasificacionResponseDTO.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\controller\CargaController.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\dto\external\ClasificacionRequestDTO.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\service\CargaService.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\CargaMsApplication.java
+C:\Users\Fabian\Desktop\proyecto\carga-ms\carga-ms\src\main\java\com\aduanas\comex\cargams\config\SecurityConfig.java

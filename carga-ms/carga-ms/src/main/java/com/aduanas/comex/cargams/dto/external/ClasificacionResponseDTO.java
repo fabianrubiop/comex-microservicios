@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 @Data
 public class ClasificacionResponseDTO {
-    private Long id;
+    private Long idClasificacion; // ✅ CORREGIDO: Especificado
     private Long cargaId;
     private String tipoClasificacion;
     private Boolean permitido;
