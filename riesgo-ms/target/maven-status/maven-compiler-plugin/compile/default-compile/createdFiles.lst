@@ -1,0 +1,15 @@
+com\aduanas\comex\riesgo_ms\dto\RiesgoRequestDTO.class
+com\aduanas\comex\riesgo_ms\dto\RiesgoResponseDTO.class
+com\aduanas\comex\riesgo_ms\entity\Riesgo.class
+com\aduanas\comex\riesgo_ms\controller\RiesgoController.class
+com\aduanas\comex\riesgo_ms\repository\RiesgoRepository.class
+com\aduanas\comex\riesgo_ms\exception\GlobalExceptionHandler.class
+com\aduanas\comex\riesgo_ms\config\SecurityConfig.class
+com\aduanas\comex\riesgo_ms\enums\CanalRiesgo.class
+com\aduanas\comex\riesgo_ms\exception\RiesgoException.class
+com\aduanas\comex\riesgo_ms\dto\RiesgoRequestDTO$RiesgoRequestDTOBuilder.class
+com\aduanas\comex\riesgo_ms\client\CargaClient.class
+com\aduanas\comex\riesgo_ms\RiesgoMsApplication.class
+com\aduanas\comex\riesgo_ms\dto\RiesgoResponseDTO$RiesgoResponseDTOBuilder.class
+com\aduanas\comex\riesgo_ms\entity\Riesgo$RiesgoBuilder.class
+com\aduanas\comex\riesgo_ms\service\RiesgoService.class

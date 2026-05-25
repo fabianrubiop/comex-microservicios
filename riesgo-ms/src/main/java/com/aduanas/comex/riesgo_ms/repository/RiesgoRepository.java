@@ -1,29 +1,16 @@
 package com.aduanas.comex.riesgo_ms.repository;
 
-// ENTITY
 import com.aduanas.comex.riesgo_ms.entity.Riesgo;
-
-// ENUM
-import com.aduanas.comex.riesgo_ms.enums.NivelRiesgo;
-
-// JPA
+import com.aduanas.comex.riesgo_ms.enums.CanalRiesgo;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-// LIST
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
-// JpaRepository genera CRUD automático
-public interface RiesgoRepository  extends JpaRepository<Riesgo, Long> {
+@Repository
+public interface RiesgoRepository extends JpaRepository<Riesgo, Long> {
 
-    // ===============================
-    // QUERY METHOD
-    // ===============================
-    // Spring genera SQL automático
-    //
-    // SELECT * FROM riesgos
-    // WHERE nivel = ?
-    List<Riesgo>
-    findByNivel(
-            NivelRiesgo nivel
-    );
+    List<Riesgo> findByCanalAsignado(CanalRiesgo canal);
+
+    // ✅ CORREGIDO: Cambiado findByCargaId por findByIdCarga para alinearse a la Entidad
+    List<Riesgo> findByIdCarga(Long idCarga);
 }

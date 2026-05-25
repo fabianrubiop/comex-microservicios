@@ -1,438 +1,163 @@
 package com.aduanas.comex.riesgo_ms.service;
 
-// ======================================================
-// ===================== IMPORTS =========================
-// ======================================================
-
-// DTOs
+import com.aduanas.comex.riesgo_ms.client.CargaClient;
 import com.aduanas.comex.riesgo_ms.dto.RiesgoRequestDTO;
 import com.aduanas.comex.riesgo_ms.dto.RiesgoResponseDTO;
-
-// Entity
 import com.aduanas.comex.riesgo_ms.entity.Riesgo;
-
-// Enums
-import com.aduanas.comex.riesgo_ms.enums.EstadoRiesgo;
-import com.aduanas.comex.riesgo_ms.enums.NivelRiesgo;
-
-// Exception personalizada
+import com.aduanas.comex.riesgo_ms.enums.CanalRiesgo;
 import com.aduanas.comex.riesgo_ms.exception.RiesgoException;
-
-// Repository
 import com.aduanas.comex.riesgo_ms.repository.RiesgoRepository;
-
-// Service
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-// Fecha
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-
-// Listas
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @Service
+@AllArgsConstructor
 public class RiesgoService {
 
-    // ======================================================
-    // ===================== REPOSITORY =====================
-    // ======================================================
-    // Esta variable permite acceder a MySQL.
-    //
-    // Gracias a JpaRepository podemos usar:
-    //
-    // save()
-    // findAll()
-    // findById()
-    // deleteById()
-    //
     private final RiesgoRepository repository;
+    private final CargaClient cargaClient;
 
-    // ======================================================
-    // ===================== CONSTRUCTOR ====================
-    // ======================================================
-    // Spring inyecta automáticamente el repository.
-    //
-    // Gracias a esto NO hacemos:
-    //
-    // new RiesgoRepository()
-    //
-    public RiesgoService(
-            RiesgoRepository repository
-    ) {
-
-        this.repository = repository;
+    @Transactional(readOnly = true)
+    public boolean evaluarRiesgoPolitico(String rut, String pais) {
+        log.info("Evaluando matriz de riesgo político para RUT: {} y País: {}", rut, pais);
+        if ("AFGANISTAN".equalsIgnoreCase(pais) || "IRAN".equalsIgnoreCase(pais) || rut.startsWith("999")) {
+            return true;
+        }
+        return false;
     }
 
-    // ======================================================
-    // ===================== CREAR ==========================
-    // ======================================================
-    //
-    // Este método:
-    //
-    // 1. recibe datos desde Postman
-    // 2. convierte DTO → Entity
-    // 3. guarda en MySQL
-    // 4. devuelve ResponseDTO
-    //
-    public RiesgoResponseDTO crear(
+    @Transactional(rollbackFor = Exception.class)
+    public RiesgoResponseDTO crear(RiesgoRequestDTO dto) {
+        Riesgo riesgo = Riesgo.builder()
+                .descripcion(dto.getDescripcion())
+                .tipoCarga(dto.getTipoCarga())
+                .origen(dto.getOrigen())
+                .idCarga(dto.getIdCarga())
+                .puntajeRiesgo(dto.getPuntajeRiesgo())
+                .motivoAlerta(dto.getMotivoAlerta())
+                .canalAsignado(CanalRiesgo.valueOf(dto.getCanalAsignado().toUpperCase()))
+                .fechaRegistro(LocalDateTime.now())
+                .fechaEvaluacion(LocalDateTime.now())
+                .build();
 
-            RiesgoRequestDTO dto
-    ) {
+        Riesgo guardado = repository.save(riesgo);
+        return convertirResponseDTO(guardado);
+    }
 
-        // ======================================================
-        // ================= VALIDACIÓN EXTRA ===================
-        // ======================================================
-        //
-        // Aunque ya existe @NotBlank,
-        // aquí puedes agregar lógica negocio.
-        //
-        // Ejemplo:
-        //
-        // NO permitir origen desconocido
-        //
-        if(dto.getOrigen()
-                .equalsIgnoreCase("desconocido")) {
+    @SuppressWarnings("unchecked")
+    @Transactional(rollbackFor = Exception.class)
+    public RiesgoResponseDTO evaluarCarga(Long idCarga) {
+        int puntaje = calcularPuntaje(idCarga);
+        String descripcionCarga = "Evaluación automática de riesgo";
+        String paisOrigen = "Desconocido";
 
-            throw new RiesgoException(
-                    "El origen no puede ser desconocido"
-            );
+        try {
+            Object respuestaCarga = cargaClient.obtenerCargaPorId(idCarga);
+            if (respuestaCarga instanceof Map<?, ?> mapaGenerico) {
+                // ✅ SOLUCIONADO: Casteo seguro a tipos conocidos para evitar el error 'capture<?>'
+                Map<String, Object> datosCarga = (Map<String, Object>) mapaGenerico;
+                descripcionCarga = (String) datosCarga.getOrDefault("descripcion", descripcionCarga);
+                paisOrigen = (String) datosCarga.getOrDefault("paisOrigen", paisOrigen);
+            }
+        } catch (Exception e) {
+            log.error("⚠️ No se pudo conectar con carga-ms. Usando genéricos: {}", e.getMessage());
         }
 
-        // ======================================================
-        // ================= CREAR ENTITY =======================
-        // ======================================================
-        //
-        // La Entity representa
-        // la tabla SQL.
-        //
-        Riesgo riesgo =
-                new Riesgo();
+        Riesgo riesgo = Riesgo.builder()
+                .idCarga(idCarga)
+                .puntajeRiesgo(puntaje)
+                .descripcion(descripcionCarga)
+                .tipoCarga("Carga General")
+                .origen(paisOrigen)
+                .fechaRegistro(LocalDateTime.now())
+                .fechaEvaluacion(LocalDateTime.now())
+                .build();
 
-        // ======================================================
-        // =============== DTO → ENTITY =========================
-        // ======================================================
-        //
-        // Aquí movemos datos
-        // desde el DTO hacia la Entity.
-        //
-
-        riesgo.setDescripcion(
-                dto.getDescripcion()
-        );
-
-        // ======================================================
-        // STRING → ENUM
-        // ======================================================
-        //
-        // El DTO recibe:
-        //
-        // "ALTO"
-        //
-        // pero la Entity usa enum:
-        //
-        // NivelRiesgo.ALTO
-        //
-        riesgo.setNivel(
-                NivelRiesgo.valueOf(
-                        dto.getNivel()
-                )
-        );
-
-        riesgo.setEstado(
-                EstadoRiesgo.valueOf(
-                        dto.getEstado()
-                )
-        );
-
-        riesgo.setTipoCarga(
-                dto.getTipoCarga()
-        );
-
-        riesgo.setOrigen(
-                dto.getOrigen()
-        );
-
-        // ======================================================
-        // FECHA AUTOMÁTICA
-        // ======================================================
-        //
-        // Guarda fecha y hora actual.
-        //
-        riesgo.setFechaRegistro(
-                LocalDateTime.now()
-        );
-
-        // ======================================================
-        // ================= GUARDAR MYSQL ======================
-        // ======================================================
-        //
-        // save() viene desde JpaRepository.
-        //
-        Riesgo guardado =
-                repository.save(riesgo);
-
-        // ======================================================
-        // ================= RETORNAR DTO =======================
-        // ======================================================
-        //
-        // Devuelve datos limpios
-        // al cliente.
-        //
-        return convertirResponseDTO(
-                guardado
-        );
-    }
-
-    // ======================================================
-    // ===================== LISTAR =========================
-    // ======================================================
-    //
-    // Obtiene TODOS los riesgos.
-    //
-    public List<RiesgoResponseDTO>
-    listar() {
-
-        // ======================================================
-        // findAll()
-        // ======================================================
-        //
-        // Obtiene todos los registros SQL.
-        //
-        return repository.findAll()
-
-                // stream()
-                // permite transformar listas
-                .stream()
-
-                // convierte Entity → DTO
-                .map(
-                        this::
-                                convertirResponseDTO
-                )
-
-                // convierte stream → lista
-                .toList();
-    }
-
-    // ======================================================
-    // ===================== BUSCAR ID ======================
-    // ======================================================
-    //
-    // Busca un riesgo por ID.
-    //
-    public RiesgoResponseDTO
-    buscarPorId(Long id) {
-
-        // ======================================================
-        // findById()
-        // ======================================================
-        //
-        // Busca por primary key.
-        //
-        Riesgo riesgo =
-                repository.findById(id)
-
-                        // Si NO existe:
-                        // lanzar excepción
-                        .orElseThrow(() ->
-
-                                new RiesgoException(
-                                        "Riesgo no encontrado"
-                                )
-                        );
-
-        // Entity → DTO
-        return convertirResponseDTO(
-                riesgo
-        );
-    }
-
-    // ======================================================
-    // ===================== QUERY METHOD ===================
-    // ======================================================
-    //
-    // Busca riesgos por nivel.
-    //
-    // Ejemplo:
-    //
-    // ALTO
-    // BAJO
-    //
-    public List<RiesgoResponseDTO>
-    buscarPorNivel(
-            String nivel
-    ) {
-
-        // ======================================================
-        // QUERY METHOD
-        // ======================================================
-        //
-        // Spring genera SQL automáticamente:
-        //
-        // SELECT * FROM riesgos
-        // WHERE nivel = ?
-        //
-        List<Riesgo> lista =
-                repository.findByNivel(
-
-                        NivelRiesgo.valueOf(
-                                nivel
-                        )
-                );
-
-        // ======================================================
-        // ENTITY → DTO
-        // ======================================================
-        return lista.stream()
-
-                .map(
-                        this::
-                                convertirResponseDTO
-                )
-
-                .toList();
-    }
-
-    // ======================================================
-    // ===================== ELIMINAR =======================
-    // ======================================================
-    //
-    // Elimina un riesgo por ID.
-    //
-    public void eliminar(Long id) {
-
-        // ======================================================
-        // VALIDAR EXISTENCIA
-        // ======================================================
-        //
-        // existsById()
-        // verifica si existe.
-        //
-        if(!repository.existsById(id)) {
-
-            throw new RiesgoException(
-                    "No se puede eliminar. Riesgo inexistente"
-            );
+        if (puntaje < 40) {
+            riesgo.setCanalAsignado(CanalRiesgo.VERDE);
+            riesgo.setMotivoAlerta("Carga confiable. Canal Verde automático.");
+        } else if (puntaje < 70) {
+            riesgo.setCanalAsignado(CanalRiesgo.NARANJA);
+            riesgo.setMotivoAlerta("Riesgo moderado. Revisión documental.");
+        } else {
+            riesgo.setCanalAsignado(CanalRiesgo.ROJO);
+            riesgo.setMotivoAlerta("Alto riesgo. Requiere inspección física.");
         }
 
-        // ======================================================
-        // DELETE SQL
-        // ======================================================
-        repository.deleteById(id);
+        Riesgo guardado = repository.save(riesgo);
+        return convertirResponseDTO(guardado);
     }
 
-    // ======================================================
-    // ===================== UPDATE =========================
-    // ======================================================
-    //
-    // Actualiza un riesgo existente.
-    //
-    public RiesgoResponseDTO actualizar(
-
-            Long id,
-
-            RiesgoRequestDTO dto
-    ) {
-
-        // ======================================================
-        // BUSCAR EXISTENTE
-        // ======================================================
-        Riesgo riesgo =
-                repository.findById(id)
-
-                        .orElseThrow(() ->
-
-                                new RiesgoException(
-                                        "Riesgo no encontrado"
-                                )
-                        );
-
-        // ======================================================
-        // ACTUALIZAR DATOS
-        // ======================================================
-        riesgo.setDescripcion(
-                dto.getDescripcion()
-        );
-
-        riesgo.setNivel(
-                NivelRiesgo.valueOf(
-                        dto.getNivel()
-                )
-        );
-
-        riesgo.setEstado(
-                EstadoRiesgo.valueOf(
-                        dto.getEstado()
-                )
-        );
-
-        riesgo.setTipoCarga(
-                dto.getTipoCarga()
-        );
-
-        riesgo.setOrigen(
-                dto.getOrigen()
-        );
-
-        // ======================================================
-        // GUARDAR UPDATE
-        // ======================================================
-        Riesgo actualizado =
-                repository.save(riesgo);
-
-        // ======================================================
-        // RETORNAR DTO
-        // ======================================================
-        return convertirResponseDTO(
-                actualizado
-        );
+    @Transactional(readOnly = true)
+    public List<RiesgoResponseDTO> listar() {
+        return repository.findAll().stream().map(this::convertirResponseDTO).toList();
     }
 
-    // ======================================================
-    // ============== ENTITY → RESPONSE DTO =================
-    // ======================================================
-    //
-    // Método reutilizable.
-    //
-    // Convierte Entity en ResponseDTO.
-    //
-    private RiesgoResponseDTO
-    convertirResponseDTO(
+    @Transactional(readOnly = true)
+    public RiesgoResponseDTO buscarPorId(Long idRiesgo) {
+        Riesgo riesgo = repository.findById(idRiesgo)
+                .orElseThrow(() -> new RiesgoException("Riesgo no encontrado"));
+        return convertirResponseDTO(riesgo);
+    }
 
-            Riesgo entity
-    ) {
+    @Transactional(readOnly = true)
+    public List<RiesgoResponseDTO> buscarPorCanal(String canal) {
+        CanalRiesgo canalEnum = CanalRiesgo.valueOf(canal.toUpperCase());
+        return repository.findByCanalAsignado(canalEnum).stream().map(this::convertirResponseDTO).toList();
+    }
 
-        return RiesgoResponseDTO
+    @Transactional(readOnly = true)
+    public List<RiesgoResponseDTO> buscarPorCarga(Long idCarga) {
+        return repository.findByIdCarga(idCarga).stream().map(this::convertirResponseDTO).toList();
+    }
 
-                // Builder ayuda a construir objetos
-                .builder()
+    @Transactional(rollbackFor = Exception.class)
+    public RiesgoResponseDTO actualizar(Long idRiesgo, RiesgoRequestDTO dto) {
+        Riesgo riesgo = repository.findById(idRiesgo)
+                .orElseThrow(() -> new RiesgoException("Riesgo no encontrado"));
 
-                .id(entity.getId())
+        riesgo.setDescripcion(dto.getDescripcion());
+        riesgo.setTipoCarga(dto.getTipoCarga());
+        riesgo.setOrigen(dto.getOrigen());
+        riesgo.setIdCarga(dto.getIdCarga());
+        riesgo.setPuntajeRiesgo(dto.getPuntajeRiesgo());
+        riesgo.setMotivoAlerta(dto.getMotivoAlerta());
+        riesgo.setCanalAsignado(CanalRiesgo.valueOf(dto.getCanalAsignado().toUpperCase()));
+        riesgo.setFechaEvaluacion(LocalDateTime.now());
 
-                .descripcion(
-                        entity.getDescripcion()
-                )
+        Riesgo actualizado = repository.save(riesgo);
+        return convertirResponseDTO(actualizado);
+    }
 
-                .nivel(
-                        entity.getNivel().name()
-                )
+    @Transactional(rollbackFor = Exception.class)
+    public void eliminar(Long idRiesgo) {
+        Riesgo riesgo = repository.findById(idRiesgo)
+                .orElseThrow(() -> new RiesgoException("Riesgo no encontrado"));
+        repository.delete(riesgo);
+    }
 
-                .estado(
-                        entity.getEstado().name()
-                )
+    private int calcularPuntaje(Long idCarga) {
+        return (int) (Math.random() * 100);
+    }
 
-                .tipoCarga(
-                        entity.getTipoCarga()
-                )
-
-                .origen(
-                        entity.getOrigen()
-                )
-
-                .fechaRegistro(
-                        entity.getFechaRegistro()
-                )
-
+    private RiesgoResponseDTO convertirResponseDTO(Riesgo riesgo) {
+        return RiesgoResponseDTO.builder()
+                .idRiesgo(riesgo.getIdRiesgo())
+                .descripcion(riesgo.getDescripcion())
+                .tipoCarga(riesgo.getTipoCarga())
+                .origen(riesgo.getOrigen())
+                .fechaRegistro(riesgo.getFechaRegistro())
+                .idCarga(riesgo.getIdCarga())
+                .puntajeRiesgo(riesgo.getPuntajeRiesgo())
+                .canalAsignado(riesgo.getCanalAsignado() != null ? riesgo.getCanalAsignado().name() : null)
+                .motivoAlerta(riesgo.getMotivoAlerta())
+                .fechaEvaluacion(riesgo.getFechaEvaluacion())
                 .build();
     }
 }

@@ -1,0 +1,12 @@
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\dto\RiesgoRequestDTO.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\dto\RiesgoResponseDTO.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\enums\CanalRiesgo.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\RiesgoMsApplication.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\entity\Riesgo.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\exception\RiesgoException.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\config\SecurityConfig.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\client\CargaClient.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\controller\RiesgoController.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\exception\GlobalExceptionHandler.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\repository\RiesgoRepository.java
+C:\Users\Fabian\Desktop\proyecto\riesgo-ms\src\main\java\com\aduanas\comex\riesgo_ms\service\RiesgoService.java

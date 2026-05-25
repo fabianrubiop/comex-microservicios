@@ -1,226 +1,72 @@
 package com.aduanas.comex.riesgo_ms.controller;
 
-// ======================================================
-// ===================== IMPORTS =========================
-// ======================================================
-
-// DTOs
 import com.aduanas.comex.riesgo_ms.dto.RiesgoRequestDTO;
 import com.aduanas.comex.riesgo_ms.dto.RiesgoResponseDTO;
-
-// Service
 import com.aduanas.comex.riesgo_ms.service.RiesgoService;
-
-// Validaciones
 import jakarta.validation.Valid;
-
-// REST CONTROLLER
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-// Listas
 import java.util.List;
 
-// ======================================================
-// ================= REST CONTROLLER =====================
-// ======================================================
-//
-// Esta clase expone endpoints REST.
-//
-// Permite recibir requests desde:
-// - Postman
-// - Frontend
-// - Swagger
-//
 @RestController
-
-// ======================================================
-// URL BASE
-// ======================================================
-//
-// Todos los endpoints comenzarán con:
-//
-// /riesgos
-//
-@RequestMapping("/riesgos")
+@AllArgsConstructor
+@RequestMapping("/api/v1/riesgos")
 public class RiesgoController {
 
-    // ======================================================
-    // ===================== SERVICE =========================
-    // ======================================================
-    //
-    // El controller utiliza el service
-    // para ejecutar lógica negocio.
-    //
-    // El controller NO debería
-    // conectarse directo a MySQL.
-    //
-    private final RiesgoService service;
+    private final RiesgoService riesgoService;
 
-    // ======================================================
-    // ===================== CONSTRUCTOR =====================
-    // ======================================================
-    //
-    // Spring inyecta automáticamente
-    // el service.
-    //
-    public RiesgoController(
-            RiesgoService service
+    // ✅ CONECTADO: Mapeo exacto de parámetros URL para el cliente Feign de clasificación
+    @GetMapping("/evaluar")
+    public ResponseEntity<Boolean> evaluarRiesgoPolitico(
+            @RequestParam String rut,
+            @RequestParam String pais
     ) {
-
-        this.service = service;
+        boolean tieneRiesgo = riesgoService.evaluarRiesgoPolitico(rut, pais);
+        return ResponseEntity.ok(tieneRiesgo);
     }
 
-    // ======================================================
-    // ===================== CREAR ===========================
-    // ======================================================
-    //
-    // Endpoint:
-    //
-    // POST /riesgos
-    //
-    // Sirve para crear un riesgo.
-    //
     @PostMapping
-
-    public RiesgoResponseDTO crear(
-
-            // ======================================================
-            // @Valid
-            // ======================================================
-            //
-            // Ejecuta validaciones del DTO.
-            //
-            // Ejemplo:
-            //
-            // @NotBlank
-            // @Size
-            //
-            @Valid
-
-            // ======================================================
-            // @RequestBody
-            // ======================================================
-            //
-            // Convierte JSON → Java.
-            //
-            @RequestBody
-
-            RiesgoRequestDTO dto
-    ) {
-
-        // ======================================================
-        // LLAMAR SERVICE
-        // ======================================================
-        //
-        // El controller delega la lógica.
-        //
-        return service.crear(dto);
+    public ResponseEntity<RiesgoResponseDTO> crear(@Valid @RequestBody RiesgoRequestDTO dto) {
+        RiesgoResponseDTO respuesta = riesgoService.crear(dto);
+        return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
     }
 
-    // ======================================================
-    // ===================== LISTAR ==========================
-    // ======================================================
-    //
-    // Endpoint:
-    //
-    // GET /riesgos
-    //
-    // Obtiene todos los riesgos.
-    //
+    @PostMapping("/evaluar/{idCarga}")
+    public ResponseEntity<RiesgoResponseDTO> evaluarCarga(@PathVariable Long idCarga) {
+        RiesgoResponseDTO respuesta = riesgoService.evaluarCarga(idCarga);
+        return ResponseEntity.ok(respuesta);
+    }
+
     @GetMapping
-    public List<RiesgoResponseDTO> listar() {
-
-        return service.listar();
+    public ResponseEntity<List<RiesgoResponseDTO>> listar() {
+        return ResponseEntity.ok(riesgoService.listar());
     }
 
-    // ======================================================
-    // ===================== BUSCAR ID =======================
-    // ======================================================
-    //
-    // Endpoint:
-    //
-    // GET /riesgos/1
-    //
-    // Busca riesgo por ID.
-    //
-    @GetMapping("/{id}")
-
-    public RiesgoResponseDTO
-    buscarPorId( @PathVariable Long id)
-
-            // ======================================================
-            // @PathVariable
-            // ======================================================
-            //
-            // Obtiene valor desde URL.
-            //
-     {
-
-        return service.buscarPorId(id);
+    @GetMapping("/{idRiesgo}")
+    public ResponseEntity<RiesgoResponseDTO> buscarPorId(@PathVariable Long idRiesgo) {
+        return ResponseEntity.ok(riesgoService.buscarPorId(idRiesgo));
     }
 
-    // ======================================================
-    // ===================== BUSCAR NIVEL ====================
-    // ======================================================
-    //
-    // Endpoint:
-    //
-    // GET /riesgos/nivel/ALTO
-    //
-    // Busca riesgos por nivel.
-    //
-    @GetMapping("/nivel/{nivel}")
-
-    public List<RiesgoResponseDTO> buscarPorNivel(@PathVariable String nivel) {
-
-        return service.buscarPorNivel(nivel);
+    @GetMapping("/canal/{canal}")
+    public ResponseEntity<List<RiesgoResponseDTO>> buscarPorCanal(@PathVariable String canal) {
+        return ResponseEntity.ok(riesgoService.buscarPorCanal(canal));
     }
 
-    // ======================================================
-    // ===================== ACTUALIZAR ======================
-    // ======================================================
-    //
-    // Endpoint:
-    //
-    // PUT /riesgos/1
-    //
-    // Actualiza un riesgo existente.
-    //
-    @PutMapping("/{id}")
-
-    public RiesgoResponseDTO actualizar(@PathVariable Long id, @Valid  @RequestBody  RiesgoRequestDTO dto)
-
-            // ID URL = @PathVariable, Long id,
-
-            // Validar DTO @Valid
-
-            // JSON BODY @RequestBody
-            {
-
-        return service.actualizar(
-                id,
-                dto
-        );
+    @GetMapping("/carga/{idCarga}")
+    public ResponseEntity<List<RiesgoResponseDTO>> buscarPorCarga(@PathVariable Long idCarga) {
+        return ResponseEntity.ok(riesgoService.buscarPorCarga(idCarga));
     }
 
-    // ======================================================
-    // ===================== ELIMINAR ========================
-    // ======================================================
-    //
-    // Endpoint:
-    //
-    // DELETE /riesgos/1
-    //
-    // Elimina riesgo por ID.
-    //
-    @DeleteMapping("/{id}")
+    @PutMapping("/{idRiesgo}")
+    public ResponseEntity<RiesgoResponseDTO> actualizar(@PathVariable Long idRiesgo, @Valid @RequestBody RiesgoRequestDTO dto) {
+        return ResponseEntity.ok(riesgoService.actualizar(idRiesgo, dto));
+    }
 
-    public void eliminar(
-
-            @PathVariable
-            Long id
-    ) {
-
-        service.eliminar(id);
+    @DeleteMapping("/{idRiesgo}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long idRiesgo) {
+        riesgoService.eliminar(idRiesgo);
+        return ResponseEntity.noContent().build();
     }
 }
