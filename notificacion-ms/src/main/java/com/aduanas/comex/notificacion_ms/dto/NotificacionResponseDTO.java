@@ -11,10 +11,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class NotificacionResponseDTO {
 
-    private Long id;
+    // ✅ Sincronizado con el nombre de la entidad
+    private Long idNotificacion;
+
+    // ✅ SOLUCIONADO: Cambiado de cargaId a idCarga
+    private Long idCarga;
 
     private String mensaje;
 
@@ -24,5 +27,6 @@ public class NotificacionResponseDTO {
 
     private String estado;
 
-    private LocalDateTime fecha;
+    // ✅ Sincronizado con el nombre de la entidad
+    private LocalDateTime fechaNotificacion;
 }

@@ -2,81 +2,51 @@ package com.aduanas.comex.notificacion_ms.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ERROR PERSONALIZADO
-    @ExceptionHandler(
-            NotificacionException.class
-    )
-    public ResponseEntity<Map<String, Object>>
-    manejarNotificacionException(
-            NotificacionException ex
-    ) {
-
-        Map<String, Object> error =
-                new HashMap<>();
-
-        error.put(
-                "mensaje",
-                ex.getMessage()
-        );
-
-        error.put(
-                "status",
-                404
-        );
-
-        error.put(
-                "fecha",
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(error);
+    // ======================================================
+    // 1. ERROR PERSONALIZADO (NotificacionException)
+    // ======================================================
+    @ExceptionHandler(NotificacionException.class)
+    public ResponseEntity<Map<String, String>> manejarNotificacionException(NotificacionException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("mensaje", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    // ERROR VALIDACIONES DTO
-    @ExceptionHandler(
-            MethodArgumentNotValidException.class
-    )
-    public ResponseEntity<Map<String, Object>>
-    manejarValidaciones(
-            MethodArgumentNotValidException ex
-    ) {
+    // ======================================================
+    // 2. ERROR DE VALIDACIÓN DE DTOs (Campos obligatorios @NotBlank/@NotNull)
+    // ======================================================
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> manejarValidaciones(MethodArgumentNotValidException ex) {
+        Map<String, String> errores = new HashMap<>();
 
-        Map<String, Object> error =
-                new HashMap<>();
+        // Mapea cada campo que falló con su respectivo mensaje personalizado
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String nombreCampo = ((FieldError) error).getField();
+            String mensajeError = error.getDefaultMessage();
+            errores.put(nombreCampo, mensajeError);
+        });
 
-        error.put(
-                "mensaje",
-                "Error de validación"
-        );
+        return new ResponseEntity<>(errores, HttpStatus.BAD_REQUEST); // Retorna 400 Bad Request
+    }
 
-        error.put(
-                "detalle",
-                ex.getBindingResult()
-                        .getFieldError()
-                        .getDefaultMessage()
-        );
-
-        error.put(
-                "status",
-                400
-        );
-
-        return ResponseEntity
-                .badRequest()
-                .body(error);
+    // ======================================================
+    // 3. ERROR GENERAL (Cualquier otra falla inesperada)
+    // ======================================================
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> manejarException(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("mensaje", "Error interno del servidor: " + ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

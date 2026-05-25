@@ -1,0 +1,14 @@
+com\aduanas\comex\notificacion_ms\exception\NotificacionException.class
+com\aduanas\comex\notificacion_ms\dto\NotificacionResponseDTO$NotificacionResponseDTOBuilder.class
+com\aduanas\comex\notificacion_ms\entity\Notificacion.class
+com\aduanas\comex\notificacion_ms\enums\TipoNotificacion.class
+com\aduanas\comex\notificacion_ms\dto\NotificacionResponseDTO.class
+com\aduanas\comex\notificacion_ms\enums\EstadoNotificacion.class
+com\aduanas\comex\notificacion_ms\dto\NotificacionRequestDTO.class
+com\aduanas\comex\notificacion_ms\repository\NotificacionRepository.class
+com\aduanas\comex\notificacion_ms\config\SecurityConfig.class
+com\aduanas\comex\notificacion_ms\NotificacionMsApplication.class
+com\aduanas\comex\notificacion_ms\exception\GlobalExceptionHandler.class
+com\aduanas\comex\notificacion_ms\service\NotificacionService.class
+com\aduanas\comex\notificacion_ms\controller\NotificacionController.class
+com\aduanas\comex\notificacion_ms\entity\Notificacion$NotificacionBuilder.class
