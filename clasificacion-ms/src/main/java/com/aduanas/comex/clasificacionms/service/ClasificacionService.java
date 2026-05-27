@@ -66,7 +66,7 @@ public class ClasificacionService {
 
             try {
                 // ✅ CORREGIDO: Mandamos el estado como String o el Enum propio del MS, evitando acoplamiento cruzado de Enums
-                cargaClient.actualizarEstado(dto.getIdCarga(), BigDecimal.ZERO, "RECHAZADA");
+                cargaClient.actualizarEstado(dto.getIdCarga(), BigDecimal.ZERO, "RECHAZADA", null);
             } catch (Exception e) {
                 log.error("Error al actualizar estado de rechazo en carga-ms: {}", e.getMessage());
             }
@@ -107,7 +107,7 @@ public class ClasificacionService {
         // =========================================================================
         try {
             log.info("1. Notificando cambio de estado a carga-ms como PENDIENTE_PAGO");
-            cargaClient.actualizarEstado(dto.getIdCarga(), impuestoTotal, "PENDIENTE_PAGO");
+            cargaClient.actualizarEstado(dto.getIdCarga(), impuestoTotal, "PENDIENTE_PAGO", null);
 
             log.info("2. Enviando orden de recaudación a pagos-ms para Carga ID: {}", dto.getIdCarga());
             // ✅ ESTA ES LA LLAMADA CRUCIAL: Asegúrate que PagoClient use @RequestParam("idCarga")
@@ -186,9 +186,9 @@ public class ClasificacionService {
                 .build();
     }
 
-    public void liberarCargaEnSistema(Long idCarga, String estado) {
+    public void liberarCargaEnSistema(Long idCarga, String estado, String voucher) {
         Clasificacion c = clasificacionRepository.findFirstByIdCargaOrderByIdClasificacionDesc(idCarga)
                 .orElseThrow(() -> new RuntimeException("No existe"));
-        cargaClient.actualizarEstado(idCarga, c.getMontoImpuesto(), estado);
+        cargaClient.actualizarEstado(idCarga, c.getMontoImpuesto(), estado, voucher);
     }
 }

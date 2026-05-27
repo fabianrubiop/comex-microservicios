@@ -47,8 +47,8 @@ public class ClasificacionController {
     }
 
     @PostMapping("/{idCarga}/liberar")
-    public ResponseEntity<Void> liberarCarga(@PathVariable Long idCarga, @RequestParam String estadoAduanero) {
-        clasificacionService.liberarCargaEnSistema(idCarga, estadoAduanero);
+    public ResponseEntity<Void> liberarCarga(@PathVariable(name = "idCarga") Long idCarga, @RequestParam String estadoAduanero, @RequestParam String voucher) {
+        clasificacionService.liberarCargaEnSistema(idCarga, estadoAduanero, voucher);
         return ResponseEntity.ok().build();
     }
 }

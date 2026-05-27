@@ -12,8 +12,9 @@ public interface CargaClient {
 
     @PostMapping("/api/v1/cargas/{idCarga}/actualizar-estado") // ✅ CAMBIADO a POST
     void actualizarEstado(
-            @PathVariable("idCarga") Long idCarga,
-            @RequestParam("impuesto") BigDecimal impuesto,
-            @RequestParam("estado") String estado
+            @PathVariable(name = "idCarga") Long idCarga, // ✅ Agregado (name = "idCarga")
+            @RequestParam(name = "impuesto") BigDecimal impuesto,
+            @RequestParam(name = "estado") String estado,
+            @RequestParam(name = "voucher", required = false) String voucher // ✅ Permitimos que sea opcional
     );
 }
