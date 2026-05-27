@@ -19,50 +19,31 @@ public class PagoController {
 
     private final PagoService pagoService;
 
-    // ==========================================
-    // POST: REGISTRAR INTENTO DE PAGO (PENDIENTE)
-    // ==========================================
     @PostMapping
     public ResponseEntity<PagoResponseDto> registrarPago(@Valid @RequestBody PagoRequestDto requestDto) {
-        PagoResponseDto respuesta = pagoService.procesarPago(requestDto);
-        return new ResponseEntity<>(respuesta, HttpStatus.CREATED); // Retorna 201 Created
+        return new ResponseEntity<>(pagoService.procesarPago(requestDto), HttpStatus.CREATED);
     }
 
-    // ==========================================
-    // POST: WEBHOOK SIMULADOR DEL BANCO (COMPLETADO / FALLIDO)
-    // ==========================================
     @PostMapping("/notificacion-banco")
     public ResponseEntity<PagoResponseDto> recibirNotificacionBanco(@Valid @RequestBody NotificacionBancoDto bancoDto) {
-        // Modifica el estado del pago y gatilla la liberación remota en carga-ms
-        PagoResponseDto respuesta = pagoService.confirmarPagoDesdeBanco(bancoDto);
-        return ResponseEntity.ok(respuesta); // Retorna 200 OK
+        return ResponseEntity.ok(pagoService.confirmarPagoDesdeBanco(bancoDto));
     }
 
-    // ==========================================
-    // GET: LISTAR TODOS LOS PAGOS
-    // ==========================================
     @GetMapping
     public ResponseEntity<List<PagoResponseDto>> listarTodos() {
-        List<PagoResponseDto> pagos = pagoService.obtenerTodosLosPagos();
-        return ResponseEntity.ok(pagos);
+        return ResponseEntity.ok(pagoService.obtenerTodosLosPagos());
     }
 
-    // ==========================================
-    // GET: BUSCAR PAGO POR ID
-    // ==========================================
     @GetMapping("/{id}")
     public ResponseEntity<PagoResponseDto> buscarPorId(@PathVariable Long id) {
-        PagoResponseDto pago = pagoService.obtenerPagoPorId(id);
-        return ResponseEntity.ok(pago);
+        return ResponseEntity.ok(pagoService.obtenerPagoPorId(id));
     }
 
-    // Este endpoint recibirá la llamada de Clasificación
     @PostMapping("/crear-orden")
     public ResponseEntity<Void> crearOrdenDesdeClasificacion(
             @RequestParam("idCarga") Long idCarga,
             @RequestParam("monto") java.math.BigDecimal monto) {
 
-        // Creamos el objeto para tu lógica de negocio
         PagoRequestDto dto = PagoRequestDto.builder()
                 .idCarga(idCarga)
                 .monto(monto)
@@ -70,7 +51,7 @@ public class PagoController {
                 .idTransaccionExterna("PENDIENTE-" + idCarga)
                 .build();
 
-        pagoService.procesarPago(dto); // Esto guarda en la DB
+        pagoService.procesarPago(dto);
         return ResponseEntity.ok().build();
     }
 }

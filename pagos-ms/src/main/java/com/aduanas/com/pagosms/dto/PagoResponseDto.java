@@ -21,6 +21,8 @@ public class PagoResponseDto {
     private String moneda;
     private String estadoPago;
     private String idTransaccionExterna;
+    private LocalDateTime fechaCreacion;
     private LocalDateTime fechaPago;
     private String resultadoTransaccion;
+    private String voucherBancario;
 }

@@ -28,11 +28,6 @@ public class Pago {
     @Column(name = "id_carga", nullable = false)
     private Long idCarga; // ✅ CORREGIDO: Estándar unificado idAlInicio
 
-    /*
-     * ¡BigDecimal: El rey para precios, impuestos y saldos!
-     * precision = 10: Número total de dígitos.
-     * scale = 2: Dígitos destinados a los centavos.
-     */
     @Column(name = "monto", precision = 10, scale = 2, nullable = false)
     private BigDecimal monto;
 
@@ -46,9 +41,14 @@ public class Pago {
     @Column(name = "id_transaccion_externa", unique = true) // ✅ CORREGIDO: Nombre unificado
     private String idTransaccionExterna;
 
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion; // Para el PASO 9
+
     @Column(name = "fecha_pago")
     private LocalDateTime fechaPago; // LocalDateTime es el estándar para marcas de tiempo
 
+    @Column(name = "voucher_bancario")
+    private String voucherBancario; // ✅ Nuevo campo para el váucher real
 
 }
 

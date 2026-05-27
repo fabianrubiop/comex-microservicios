@@ -14,10 +14,10 @@ public interface ClasificacionFeignClient {
     @GetMapping("/api/v1/clasificaciones/cargas/{id}")
     CargaExternaDto obtenerCargaPorId(@PathVariable("id") Long id);
 
-    // 2. Tu método original para liberar (con el nombre idCarga corregido)
     @PostMapping("/api/v1/clasificaciones/{idCarga}/liberar")
     void actualizarEstadoLiberacion(
             @PathVariable("idCarga") Long idCarga,
-            @RequestParam("estadoAduanero") String estadoAduanero
+            @RequestParam("estadoAduanero") String estadoAduanero,
+            @RequestParam("voucher") String voucher
     );
 }

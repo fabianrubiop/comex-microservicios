@@ -5,5 +5,5 @@ CREATE TABLE pagos (
        moneda VARCHAR(3) NOT NULL,                      -- Código ISO (ej: 'CLP', 'USD')
        estado_pago VARCHAR(30) NOT NULL,                -- 'PENDIENTE', 'PROCESANDO', 'COMPLETADO' o 'FALLIDO'
        transaccion_externa_id VARCHAR(100) UNIQUE,      -- El váucher manual de Postman
-       fecha_pago TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP -- ✅ Asegurado contra nulos
+       fecha_pago TIMESTAMP NULL
    );
