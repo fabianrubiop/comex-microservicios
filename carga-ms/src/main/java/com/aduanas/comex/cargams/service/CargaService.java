@@ -124,13 +124,13 @@ public class CargaService {
      * ASIGNAR IMPUESTO DESDE EL CONTROLADOR (Invocado remotamente por Clasificación).
      */
     @Transactional
-    public void actualizarImpuestoYEstado(Long idCarga, BigDecimal impuesto, EstadoCarga nuevoEstado) {
+    public void actualizarImpuestoYEstado(Long idCarga, BigDecimal impuesto, EstadoCarga nuevoEstado, String voucher) {
         Carga carga = cargaRepository.findById(idCarga)
                 .orElseThrow(() -> new RuntimeException("No se encontró la carga con ID: " + idCarga));
 
         carga.setMontoImpuesto(impuesto);
         carga.setEstado(nuevoEstado);
-
+        carga.setIdTransaccionExterna(voucher);
         cargaRepository.save(carga);
     }
 
@@ -166,6 +166,7 @@ public class CargaService {
                 .fechaCreacion(carga.getFechaCreacion())
                 .permitido(permitidoFinal) // Refleja la verdad del Enum
                 .montoImpuesto(carga.getMontoImpuesto() != null ? carga.getMontoImpuesto() : BigDecimal.ZERO)
+                .idTransaccionExterna(carga.getIdTransaccionExterna())
                 .observaciones(observacionesAdicionales + " - Fase actual: " + carga.getEstado().name())
                 .build();
     }

@@ -22,6 +22,7 @@ public class CargaResponseDTO {
     private String importadorRut;
     private String estado;
     private LocalDateTime fechaCreacion;
+    private String idTransaccionExterna; // ✅ Nuevo campo
 
     // Datos cruzados agregados dinámicamente desde clasificacion-ms (Sin @Transient)
     private Boolean permitido;

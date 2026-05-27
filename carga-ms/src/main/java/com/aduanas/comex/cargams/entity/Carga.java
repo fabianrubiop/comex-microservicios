@@ -51,4 +51,7 @@ public class Carga {
     @Column(name = "monto_impuesto", precision = 15, scale = 2)
     private BigDecimal montoImpuesto;
 
+    @Column(name = "id_transaccion_externa")
+    private String idTransaccionExterna;
+
 }

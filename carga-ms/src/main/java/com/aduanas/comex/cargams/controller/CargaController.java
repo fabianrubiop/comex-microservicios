@@ -37,8 +37,8 @@ public class CargaController {
 
     // Metodo interno que usaran otros servicios para actualizar estado
     @PostMapping("/{idCarga}/actualizar-estado")
-    public void actualizarEstado(@PathVariable Long idCarga, @RequestParam String estado, @RequestParam BigDecimal impuesto) {
-        cargaService.actualizarImpuestoYEstado(idCarga, impuesto, com.aduanas.comex.cargams.enums.EstadoCarga.valueOf(estado));
+    public void actualizarEstado(@PathVariable(name = "idCarga") Long idCarga, @RequestParam String estado, @RequestParam BigDecimal impuesto, @RequestParam(name = "voucher", required = false) String voucher) {
+        cargaService.actualizarImpuestoYEstado(idCarga, impuesto, com.aduanas.comex.cargams.enums.EstadoCarga.valueOf(estado), voucher);
     }
 
     @DeleteMapping("/{idCarga}")
