@@ -119,7 +119,7 @@ public class ClasificacionService {
 
             log.info("4. Enviando alerta de éxito a notificacion-ms");
 
-            // ✅ CAMBIO AQUÍ: Ahora creamos un Map y usamos el nuevo nombre del método
+            // Ahora creamos un Map y usamos el nuevo nombre del metodo
             Map<String, Object> notifPayload = Map.of(
                     "idCarga", dto.getIdCarga(),
                     "destinatario", "importaciones@comex.cl", // Puedes usar un correo real o de prueba
@@ -127,7 +127,7 @@ public class ClasificacionService {
                     "tipo", "EMAIL", // O SMS, SISTEMA
                     "estado", "ENVIADA" // O PENDIENTE
             );
-            notificacionClient.enviarAlertaJson(notifPayload); // ✅ Nuevo nombre del método y un solo argumento (el Map)
+            notificacionClient.enviarAlertaJson(notifPayload);
 
             // ... (resto del bloque catch) ...
 

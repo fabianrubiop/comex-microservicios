@@ -46,7 +46,7 @@ public class CargaService {
     }
 
     /**
-     * 2. Método principal del servicio.
+     * 2. Metodo principal del servicio.
      * INTACTO: Mantiene la lógica síncrona original y la comunicación Feign.
      */
     public CargaResponseDTO crear(CrearCargaRequestDTO dto) {
@@ -85,7 +85,7 @@ public class CargaService {
     }
 
     /**
-     * Sub-método auxiliar para aislar transaccionalmente la actualización por rechazo
+     * Sub-metodo auxiliar para aislar transaccionalmente la actualización por rechazo
      */
     @Transactional
     public void actualizarEstadoRechazado(Long idCarga) {
@@ -113,7 +113,7 @@ public class CargaService {
     }
 
     /**
-     * Método interno para consumo dentro de la clase.
+     * Metodo interno para consumo dentro de la clase.
      */
     private Carga obtenerEntidadPorId(Long idCarga) {
         return cargaRepository.findById(idCarga)
@@ -141,7 +141,7 @@ public class CargaService {
 
         Boolean permitidoFinal = permitidoForzado;
 
-        // Si no viene un valor forzado desde el método crear(), evaluamos según el escalón del Enum en la BD
+        // Si no viene un valor forzado desde el metodo crear(), evaluamos según el escalón del Enum en la BD
         if (permitidoFinal == null) {
             if (carga.getEstado() == EstadoCarga.RECHAZADA) {
                 permitidoFinal = false;
