@@ -1,16 +1,15 @@
 package com.aduanas.comex.riesgo_ms.dto;
 
-
 import jakarta.validation.constraints.*;
-
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder // ✅ AGREGADO: Para facilitar la construcción de peticiones en testing
 public class RiesgoRequestDTO {
 
     @NotBlank(message = "La descripción es obligatoria")
@@ -23,7 +22,7 @@ public class RiesgoRequestDTO {
     private String origen;
 
     @NotNull(message = "El ID de carga es obligatorio")
-    private Long cargaId;
+    private Long idCarga; // ✅ CORREGIDO: Estandard idAlInicio
 
     @NotNull(message = "El puntaje de riesgo es obligatorio")
     @Min(value = 0, message = "El puntaje mínimo es 0")

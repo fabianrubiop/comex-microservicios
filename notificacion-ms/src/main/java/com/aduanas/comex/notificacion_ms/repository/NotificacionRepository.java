@@ -8,9 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-
 public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
 
+    // Mantiene tu búsqueda por el Enum de estados
     List<Notificacion> findByEstado(EstadoNotificacion estado);
 
+    // ✅ AGREGADO: Permite buscar el histórico de notificaciones usando el idCarga unificado
+    List<Notificacion> findByIdCarga(Long idCarga);
 }

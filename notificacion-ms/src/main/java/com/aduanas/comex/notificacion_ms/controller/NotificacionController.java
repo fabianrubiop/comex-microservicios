@@ -4,16 +4,25 @@ import com.aduanas.comex.notificacion_ms.dto.NotificacionRequestDTO;
 import com.aduanas.comex.notificacion_ms.dto.NotificacionResponseDTO;
 import com.aduanas.comex.notificacion_ms.service.NotificacionService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+@Tag(name = "Notificaciones", description = "Auditoría de historial asíncrono")
+@Slf4j
 @RestController
-@RequestMapping("/notificaciones")
+@RequestMapping("/api/v1/notificaciones")
 @RequiredArgsConstructor
 public class NotificacionController {
 
@@ -21,70 +30,69 @@ public class NotificacionController {
 
     // CREAR NOTIFICACIÓN
     @PostMapping
-    public NotificacionResponseDTO crear(
-            @Valid
-            @RequestBody
-            NotificacionRequestDTO dto
+    public ResponseEntity<NotificacionResponseDTO> crear(
+            @Valid @RequestBody NotificacionRequestDTO dto
     ) {
-
-        return notificacionService.crear(dto);
+        return ResponseEntity.ok(notificacionService.crear(dto));
     }
 
     // LISTAR TODAS LAS NOTIFICACIONES
+    @Operation(summary = "Listar notificaciones", description = "Ver toda la bitácora de eventos del sistema")
     @GetMapping
-    public List<NotificacionResponseDTO> listar() {
-
-        return notificacionService.listar();
+    public CollectionModel<NotificacionResponseDTO> listar() {
+        List<NotificacionResponseDTO> lista = notificacionService.listar();
+        return CollectionModel.of(lista,
+                linkTo(methodOn(NotificacionController.class).listar()).withSelfRel()
+        );
     }
 
     // BUSCAR POR ID
     @GetMapping("/{id}")
-    public NotificacionResponseDTO buscarPorId(
+    public ResponseEntity<NotificacionResponseDTO> buscarPorId(
             @PathVariable Long id
     ) {
-
-        return notificacionService.buscarPorId(id);
+        return ResponseEntity.ok(notificacionService.buscarPorId(id));
     }
 
     // BUSCAR POR ESTADO
     @GetMapping("/estado/{estado}")
-    public List<NotificacionResponseDTO>
-    buscarPorEstado(
+    public ResponseEntity<List<NotificacionResponseDTO>> buscarPorEstado(
             @PathVariable String estado
     ) {
-
-        return notificacionService.buscarPorEstado(estado);
+        return ResponseEntity.ok(notificacionService.buscarPorEstado(estado));
     }
 
     // ACTUALIZAR NOTIFICACIÓN
     @PutMapping("/{id}")
-    public NotificacionResponseDTO actualizar(
+    public ResponseEntity<NotificacionResponseDTO> actualizar(
             @PathVariable Long id,
-
-            @Valid
-            @RequestBody
-            NotificacionRequestDTO dto
+            @Valid @RequestBody NotificacionRequestDTO dto
     ) {
-
-        return notificacionService.actualizar(id, dto);
+        return ResponseEntity.ok(notificacionService.actualizar(id, dto));
     }
 
     // ELIMINAR NOTIFICACIÓN
     @DeleteMapping("/{id}")
-    public void eliminar(
+    public ResponseEntity<Void> eliminar(
             @PathVariable Long id
     ) {
-
         notificacionService.eliminar(id);
+        return ResponseEntity.ok().build();
     }
 
+    // 🔥 REFACTORIZADO Y PARCHADO: Sincronizado con idCarga para el flujo asíncrono
     @PostMapping("/enviar-alerta")
-    public ResponseEntity<String> recibirAlerta(@RequestParam String email, @RequestParam String mensaje) {
+    public ResponseEntity<String> recibirAlerta(
+            @Valid @RequestBody NotificacionRequestDTO dto
+    ) {
+        // ✅ SOLUCIONADO: Cambiado dto.getCargaId() por dto.getIdCarga()
+        log.info("📢 [ALERTA] JSON recibido exitosamente. Carga ID: {}, Destinatario: {}", dto.getIdCarga(), dto.getDestinatario());
 
-        // Llama al servicio as铆ncrono (no se queda esperando el resultado)
-        notificacionService.enviarEmailAsincrono(email, mensaje);
+        // ✅ SOLUCIONADO: Pasando la variable unificada idCarga al hilo en segundo plano
+        notificacionService.enviarEmailAsincrono(dto.getIdCarga(), dto.getDestinatario(), dto.getMensaje());
 
-        // Retorna inmediatamente un 200 OK a Clasificaci贸n
-        return ResponseEntity.ok("Notificaci贸n recibida y proces谩ndose en segundo plano.");
+        // Retorna inmediatamente un 200 OK liberando al cliente
+        return ResponseEntity.ok("Notificación recibida en formato JSON correctamente y procesándose en segundo plano.");
     }
+
 }

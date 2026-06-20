@@ -10,11 +10,24 @@
         <relativePath/>
     </parent>
 
+
     <groupId>com.comex</groupId>
     <artifactId>gestion-carga-ms</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>gestion-carga-ms</name>
     <description>Microservicio para Proyecto COMEX</description>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>carga-ms</module>
+        <module>clasificacion-ms</module>
+        <module>pagos-ms</module>
+        <module>documentos-ms</module>
+        <module>riesgo-ms</module>
+        <module>banco-ms</module>
+        <module>notificacion-ms</module>
+    </modules>
 
     <properties>
         <java.version>17</java.version>
@@ -26,7 +39,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -106,15 +118,16 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <excludes>
-                        <exclude>
+                    <annotationProcessorPaths>
+                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

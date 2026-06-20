@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/api-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/banco-ms/banco-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/banco-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/carga-ms/carga-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/carga-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/clasificacion-ms/clasificacion-ms/clasificacion-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/clasificacion-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/documentos-ms/documentos-ms/documentos-ms/documentos-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/documentos-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notificacion-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pagos-ms/pagos-ms/pagos-ms/pagos-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/pagos-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/riesgo-ms/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
