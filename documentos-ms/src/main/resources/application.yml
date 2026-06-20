@@ -1,0 +1,26 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: documentos-ms
+  security:
+    user:
+      name: admin
+      password: comex123
+  datasource:
+    url: jdbc:mysql://localhost:3306/documento_db
+    username: root
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  flyway:
+    enabled: true
+    repair-at-start: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:comex123@localhost:8761/eureka/

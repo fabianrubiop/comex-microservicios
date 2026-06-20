@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  security:
+    user:
+      name: admin
+      password: comex123
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # Permite mapear rutas din\u00E1micamente
+      routes:
+        - id: carga-ms
+          uri: lb://carga-ms # lb:// activa Load Balancing v\u00EDa Eureka
+          predicates:
+            - Path=/api/v1/cargas/**
+        - id: clasificacion-ms
+          uri: lb://clasificacion-ms
+          predicates:
+            - Path=/api/v1/clasificaciones/**
+        - id: pagos-ms
+          uri: lb://pagos-ms
+          predicates:
+            - Path=/api/v1/pagos/**
+        - id: documentos-ms
+          uri: lb://documentos-ms
+          predicates:
+            - Path=/api/v1/documentos/**
+        - id: riesgo-ms
+          uri: lb://riesgo-ms
+          predicates:
+            - Path=/api/v1/riesgos/**
+        - id: banco-ms
+          uri: lb://banco-ms
+          predicates:
+            - Path=/api/v1/banco/**
+        - id: notificacion-ms
+          uri: lb://notificacion-ms
+          predicates:
+            - Path=/api/v1/notificaciones/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:comex123@localhost:8761/eureka/

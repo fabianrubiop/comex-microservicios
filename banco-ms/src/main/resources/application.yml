@@ -1,0 +1,15 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: banco-ms
+  security:
+    user:
+      name: admin
+      password: comex123
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:comex123@localhost:8761/eureka/
