@@ -12,10 +12,10 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true # Permite mapear rutas din\u00E1micamente
+          enabled: true
       routes:
         - id: carga-ms
-          uri: lb://carga-ms # lb:// activa Load Balancing v\u00EDa Eureka
+          uri: lb://carga-ms
           predicates:
             - Path=/api/v1/cargas/**
         - id: clasificacion-ms
@@ -46,4 +46,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://admin:comex123@localhost:8761/eureka/
+      defaultZone: http://admin:comex123@eureka-server:8761/eureka/
