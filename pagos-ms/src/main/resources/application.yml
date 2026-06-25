@@ -24,3 +24,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://admin:comex123@localhost:8761/eureka/
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs

@@ -47,3 +47,16 @@ eureka:
   client:
     service-url:
       defaultZone: http://admin:comex123@eureka-server:8761/eureka/
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: 🏦 Microservicio de Bancos
+        url: /banco-ms/v3/api-docs
+      - name: 📦 Microservicio de Carga
+        url: /carga-ms/v3/api-docs
+      - name: 🛡️ Microservicio de Riesgo
+        url: /riesgo-ms/v3/api-docs
+      - name: 📑 Microservicio de Documentos
+        url: /documentos-ms/v3/api-docs
+    operationsSorter: method

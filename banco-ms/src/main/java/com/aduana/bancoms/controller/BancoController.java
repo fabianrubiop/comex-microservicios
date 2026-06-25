@@ -2,6 +2,7 @@ package com.aduana.bancoms.controller;
 
 import com.aduana.bancoms.dto.TransaccionRequestDto;
 import com.aduana.bancoms.service.BancoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+@Tag(name = "Controlador de Bancos", description = "Endpoints de gestión financiera")
 @RestController
 @RequestMapping("/api/v1/banco")
 @RequiredArgsConstructor
