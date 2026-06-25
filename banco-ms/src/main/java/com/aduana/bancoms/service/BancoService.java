@@ -32,7 +32,7 @@ public class BancoService {
         try {
             pagoFeignClient.enviarConfirmacionAlMicroservicioPagos(notificacion);
         } catch (Exception e) {
-
+            // Si pagos-ms está caído o explota, el banco frena todo
             throw new RuntimeException("El banco procesó el dinero, pero el sistema de Aduanas (pagos-ms) no responde: " + e.getMessage());
         }
 

@@ -10,20 +10,16 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-@Tag(name = "Notificaciones", description = "Auditoría de historial asíncrono")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/notificaciones")
 @RequiredArgsConstructor
+@Tag(name = "Notificaciones",description = "peraciones relacionadas con las Notificaciones")
 public class NotificacionController {
 
     private final NotificacionService notificacionService;
@@ -37,13 +33,10 @@ public class NotificacionController {
     }
 
     // LISTAR TODAS LAS NOTIFICACIONES
-    @Operation(summary = "Listar notificaciones", description = "Ver toda la bitácora de eventos del sistema")
+    @Operation(summary = "Obtener todas las notificaciones", description = "Obtiene una lista de todas las notificaciones")
     @GetMapping
-    public CollectionModel<NotificacionResponseDTO> listar() {
-        List<NotificacionResponseDTO> lista = notificacionService.listar();
-        return CollectionModel.of(lista,
-                linkTo(methodOn(NotificacionController.class).listar()).withSelfRel()
-        );
+    public ResponseEntity<List<NotificacionResponseDTO>> listar() {
+        return ResponseEntity.ok(notificacionService.listar());
     }
 
     // BUSCAR POR ID

@@ -9,20 +9,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-@Tag(name = "Documentos", description = "Gestión de facturas y cumplimiento legal")
 @RestController
 @RequestMapping("/api/v1/documentos")
 @RequiredArgsConstructor // Inyecta el Service automáticamente al compilar
+@Tag(name ="Documentos",description = "Operaciones relacionadas con la Documentacion" )
 public class DocumentoController {
 
     private final DocumentoService documentoService;
@@ -42,18 +38,15 @@ public class DocumentoController {
     // ==========================================
     // GET: BUSCAR POR ID
     // ==========================================
-    @Operation(summary = "Consultar documento", description = "Ver estado de validación de la factura")
     @GetMapping("/{id}")
-    public EntityModel<DocumentoResponseAnalistaDTO> buscar(@PathVariable Long id) {
-        DocumentoResponseAnalistaDTO dto = documentoService.buscarPorId(id);
-        return EntityModel.of(dto,
-                linkTo(methodOn(DocumentoController.class).buscar(id)).withSelfRel()
-        );
+    public ResponseEntity<DocumentoResponseAnalistaDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(documentoService.buscarPorId(id));
     }
 
     // ==========================================
     // GET: LISTAR TODOS (Agregado para dar soporte completo al listar() del Service)
     // ==========================================
+    @Operation(summary = "Obtener todos los documentos", description = "Obtiene una lista de todod los documentos")
     @GetMapping
     public ResponseEntity<List<DocumentoResponseAnalistaDTO>> listar() {
         return ResponseEntity.ok(documentoService.listar());

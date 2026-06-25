@@ -9,13 +9,12 @@ spring:
       name: admin
       password: comex123
   datasource:
-    url: jdbc:mysql://localhost:3306/carga_db
+    url: jdbc:mysql://mysql-comex:3306/carga_db
     username: root
     password:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
   flyway:
     enabled: true
     repair-at-start: true
@@ -23,4 +22,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://admin:comex123@localhost:8761/eureka/
+      defaultZone: http://admin:comex123@eureka-server:8761/eureka/

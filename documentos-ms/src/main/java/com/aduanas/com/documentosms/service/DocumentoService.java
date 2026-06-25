@@ -119,6 +119,14 @@ public class DocumentoService {
                 .build();
     }
 
+    public DocumentoResponseAnalistaDTO buscarPorIdCarga(Long idCarga) {
+        Documento documento = documentoRepository.findAll().stream()
+                .filter(doc -> idCarga.equals(doc.getIdCarga()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No se encontró ningún documento asociado a la carga ID: " + idCarga));
+        return mapToAnalistaDTO(documento);
+    }
+
     private DocumentoResponseAnalistaDTO mapToAnalistaDTO(Documento m) {
         String estadoStr = m.getEstadoValidacion() != null ? m.getEstadoValidacion().name() : null;
         return DocumentoResponseAnalistaDTO.builder()

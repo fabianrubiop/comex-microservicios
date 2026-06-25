@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 
-@FeignClient(name = "pago-ms", url = "http://localhost:8083")
+@FeignClient(name = "pago-ms")
 public interface PagoClient {
 
     // Ruta unificada y nombres de parámetros idénticos al controlador

@@ -7,20 +7,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-@Tag(name = "Clasificación", description = "Cálculo tributario y arancelario")
 @RestController
 @RequestMapping("/api/v1/clasificaciones")
 @RequiredArgsConstructor
+@Tag(name = "Clasificaciones", description = "Operaciones relacionadas con las Clasificaciones")
 public class ClasificacionController {
 
     private final ClasificacionService clasificacionService;
@@ -37,6 +32,7 @@ public class ClasificacionController {
     }
 
     // 2. LISTAR TODAS LAS EVALUACIONES
+    @Operation(summary = "Obtener todas las cargas" , description = "Obtiene la lista todas las clasificaciones")
     @GetMapping
     public ResponseEntity<List<ClasificacionResponseDTO>> listar() {
         return ResponseEntity.ok(clasificacionService.listar());
@@ -49,14 +45,9 @@ public class ClasificacionController {
     }
 
     // 4. OBTENER LA ÚLTIMA CLASIFICACIÓN DE UNA CARGA ESPECÍFICA (✅ SOLUCIONADO: idCarga unificado)
-    @Operation(summary = "Consultar liquidación", description = "Ver desglose de impuestos calculados")
     @GetMapping("/cargas/{idCarga}")
-    public EntityModel<ClasificacionResponseDTO> obtenerPorCarga(@PathVariable Long idCarga) {
-        ClasificacionResponseDTO dto = clasificacionService.obtenerPorCargaId(idCarga);
-        return EntityModel.of(dto,
-                linkTo(methodOn(ClasificacionController.class).obtenerPorCarga(idCarga)).withSelfRel(),
-                Link.of("http://localhost:8080/api/v1/cargas/" + idCarga).withRel("volver_a_carga_maestra")
-        );
+    public ResponseEntity<ClasificacionResponseDTO> obtenerPorCargaId(@PathVariable Long idCarga) {
+        return ResponseEntity.ok(clasificacionService.obtenerPorCargaId(idCarga));
     }
 
     @PostMapping("/{idCarga}/liberar")

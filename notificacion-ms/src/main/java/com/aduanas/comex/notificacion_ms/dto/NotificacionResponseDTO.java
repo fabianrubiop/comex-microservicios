@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NotificacionResponseDTO extends RepresentationModel<NotificacionResponseDTO> {
+public class NotificacionResponseDTO {
 
     // ✅ Sincronizado con el nombre de la entidad
     private Long idNotificacion;

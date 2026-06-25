@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.RepresentationModel;
 
 import java.math.BigDecimal;
 
@@ -12,7 +11,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClasificacionResponseDTO extends RepresentationModel<ClasificacionResponseDTO> {
+public class ClasificacionResponseDTO {
 
     private Long idClasificacion; // ✅ CORREGIDO: Matamos el "id" genérico
     private Long idCarga;

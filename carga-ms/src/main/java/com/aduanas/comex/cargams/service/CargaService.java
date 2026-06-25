@@ -46,7 +46,7 @@ public class CargaService {
     }
 
     /**
-     * 2. Metodo principal del servicio.
+     * 2. Método principal del servicio.
      * INTACTO: Mantiene la lógica síncrona original y la comunicación Feign.
      */
     public CargaResponseDTO crear(CrearCargaRequestDTO dto) {
@@ -85,7 +85,7 @@ public class CargaService {
     }
 
     /**
-     * Sub-metodo auxiliar para aislar transaccionalmente la actualización por rechazo
+     * Sub-método auxiliar para aislar transaccionalmente la actualización por rechazo
      */
     @Transactional
     public void actualizarEstadoRechazado(Long idCarga) {
@@ -113,7 +113,7 @@ public class CargaService {
     }
 
     /**
-     * Metodo interno para consumo dentro de la clase.
+     * Método interno para consumo dentro de la clase.
      */
     private Carga obtenerEntidadPorId(Long idCarga) {
         return cargaRepository.findById(idCarga)
@@ -141,7 +141,7 @@ public class CargaService {
 
         Boolean permitidoFinal = permitidoForzado;
 
-        // Si no viene un valor forzado desde el metodo crear(), evaluamos según el escalón del Enum en la BD
+        // Si no viene un valor forzado desde el método crear(), evaluamos según el escalón del Enum en la BD
         if (permitidoFinal == null) {
             if (carga.getEstado() == EstadoCarga.RECHAZADA) {
                 permitidoFinal = false;
@@ -184,5 +184,12 @@ public class CargaService {
 
         // 3. Borrado físico
         cargaRepository.deleteById(idCarga);
+    }
+
+    public CargaResponseDTO findByNumeroDeclaracion(String numeroDeclaracion) {
+        Carga carga = cargaRepository.findByNumeroDeclaracion(numeroDeclaracion)
+                .orElseThrow(() -> new RuntimeException("Carga no encontrada con el número de declaración: " + numeroDeclaracion));
+
+        return convertirADto(carga, null, "Consulta por declaración aduanera");
     }
 }

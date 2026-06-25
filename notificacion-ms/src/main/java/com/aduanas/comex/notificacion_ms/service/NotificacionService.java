@@ -100,7 +100,7 @@ public class NotificacionService {
                 .build();
     }
 
-    // 🚀 METODO ASÍNCRONO COMPLETAMENTE SINCRONIZADO
+    // 🚀 MÉTODO ASÍNCRONO COMPLETAMENTE SINCRONIZADO
     @Transactional
     @Async
     public void enviarEmailAsincrono(Long idCarga, String email, String mensaje) {

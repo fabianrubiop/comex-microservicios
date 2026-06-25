@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
-@FeignClient(name = "clasificacion-ms", url = "http://localhost:8082")
+@FeignClient(name = "clasificacion-ms")
 public interface ClasificacionFeignClient {
 
     // 1. Obtiene los datos de peso e impuesto desde el microservicio de clasificación

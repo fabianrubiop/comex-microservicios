@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 
-@FeignClient(name = "carga-ms", url = "http://localhost:8081") // O la URL de tu carga-ms
+@FeignClient(name = "carga-ms") // O la URL de tu carga-ms
 public interface CargaClient {
 
     @PostMapping("/api/v1/cargas/{idCarga}/actualizar-estado") // ✅ CAMBIADO a POST

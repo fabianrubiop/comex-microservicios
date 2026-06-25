@@ -15,7 +15,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Desactiva CSRF para poder hacer POST/PUT sin problemas
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .anyRequest().permitAll() // DEJA PASAR TODO SIN CONTRASEÑA
                 );
         return http.build();
     }

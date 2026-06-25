@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.Map;
 
 // ✅ CORREGIDO: URL con la ruta base real del controlador (/api/v1/notificaciones) y puerto correcto
-@FeignClient(name = "notificacion-ms", url = "http://localhost:8087/api/v1/notificaciones")
+@FeignClient(name = "notificacion-ms")
 public interface NotificacionFeignClient {
 
     // ✅ CORREGIDO: Ahora usa @RequestBody y envía un mapa estructurado que simula perfectamente el NotificacionRequestDTO

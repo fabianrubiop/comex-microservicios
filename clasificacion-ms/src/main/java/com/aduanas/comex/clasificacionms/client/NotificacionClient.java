@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.util.Map;
 
-@FeignClient(name = "notificacion-ms", url = "http://localhost:8087")
+@FeignClient(name = "notificacion-ms")
 public interface NotificacionClient {
 
     // ✅ CORREGIDO: Ahora apunta a la ruta que SÍ existe: /enviar-alerta

@@ -7,19 +7,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-@Tag(name = "Riesgo", description = "Análisis de inteligencia aduanera")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/riesgos")
+@Tag(name = "Riesgos", description = "Operaciones relacionadas con los Riesgos")
 public class RiesgoController {
 
     private final RiesgoService riesgoService;
@@ -40,16 +36,14 @@ public class RiesgoController {
         return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Evaluar riesgo", description = "POST manual para forzar semáforo aduanero")
     @PostMapping("/evaluar/{idCarga}")
-    public EntityModel<RiesgoResponseDTO> evaluarCarga(@PathVariable Long idCarga) {
-        RiesgoResponseDTO dto = riesgoService.evaluarCarga(idCarga);
-        return EntityModel.of(dto,
-                linkTo(methodOn(RiesgoController.class).evaluarCarga(idCarga)).withSelfRel()
-        );
+    public ResponseEntity<RiesgoResponseDTO> evaluarCarga(@PathVariable Long idCarga) {
+        RiesgoResponseDTO respuesta = riesgoService.evaluarCarga(idCarga);
+        return ResponseEntity.ok(respuesta);
     }
 
     @GetMapping
+    @Operation(summary = "Obtener todos riesgos", description = "Obtiene una lista de todos los riesgos")
     public ResponseEntity<List<RiesgoResponseDTO>> listar() {
         return ResponseEntity.ok(riesgoService.listar());
     }

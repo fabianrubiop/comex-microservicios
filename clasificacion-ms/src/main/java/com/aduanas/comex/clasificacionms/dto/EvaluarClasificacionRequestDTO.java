@@ -3,11 +3,17 @@ package com.aduanas.comex.clasificacionms.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class EvaluarClasificacionRequestDTO {
 
     @NotNull(message = "El ID de la carga es obligatorio")
@@ -25,7 +31,4 @@ public class EvaluarClasificacionRequestDTO {
     @NotNull(message = "El valor declarado es obligatorio")
     @Positive(message = "El valor declarado debe ser mayor a cero")
     private BigDecimal valorDeclarado;
-
-
-
 }

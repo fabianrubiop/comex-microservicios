@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "clasificacion-ms", url = "http://localhost:8082")
+// 🎯 CORREGIDO: Se quitó el url="..." para que busque a través de Eureka usando el nombre del servicio
+@FeignClient(name = "clasificacion-ms")
 public interface ClasificacionClient {
 
-    // ✅ SOLUCIONADO: idCarga unificado en la URL y en el @PathVariable para que no explote
     @PostMapping("/api/v1/clasificaciones/evaluar/{idCarga}")
     ClasificacionResponseDTO evaluar(
             @PathVariable("idCarga") Long idCarga,

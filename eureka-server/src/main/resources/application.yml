@@ -11,9 +11,9 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: eureka-server
   client:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://admin:comex123@localhost:8761/eureka/
+      defaultZone: http://admin:comex123@eureka-server:8761/eureka/
