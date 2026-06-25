@@ -8,16 +8,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+@Tag(name = "Pagos", description = "Gestión de recaudación y Webhooks bancarios")
 @RestController
 @RequestMapping("/api/v1/pagos")
 @RequiredArgsConstructor
-@Tag(name ="Pagos",description = "Operaciones relacionadas con los Pagos")
 public class PagoController {
 
     private final PagoService pagoService;
@@ -33,14 +38,18 @@ public class PagoController {
     }
 
     @GetMapping
-    @Operation(summary = "Obtener todos los pagos", description = "Obtiene una lista de todos los pagos")
     public ResponseEntity<List<PagoResponseDto>> listarTodos() {
         return ResponseEntity.ok(pagoService.obtenerTodosLosPagos());
     }
 
+    @Operation(summary = "Ver orden de pago", description = "Consulta el estado de la recaudación")
     @GetMapping("/{id}")
-    public ResponseEntity<PagoResponseDto> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(pagoService.obtenerPagoPorId(id));
+    public EntityModel<PagoResponseDto> buscar(@PathVariable Long id) {
+        PagoResponseDto dto = pagoService.obtenerPagoPorId(id);
+        return EntityModel.of(dto,
+                linkTo(methodOn(PagoController.class).buscar(id)).withSelfRel(),
+                Link.of("http://localhost:8080/api/v1/cargas/" + dto.getIdCarga()).withRel("ver_carga_liberada")
+        );
     }
 
     @PostMapping("/crear-orden")

@@ -1,13 +1,15 @@
 package com.aduanas.comex.riesgo_ms.dto;
 
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
+
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RiesgoResponseDTO {
+public class RiesgoResponseDTO extends RepresentationModel<RiesgoResponseDTO> {
 
     private Long idRiesgo; // ✅ CORREGIDO: Cambiado de 'id' a 'idRiesgo' para calzar con la entidad
 

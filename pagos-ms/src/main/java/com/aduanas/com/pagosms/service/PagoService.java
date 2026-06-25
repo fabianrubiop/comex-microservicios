@@ -33,7 +33,7 @@ public class PagoService {
         }
 
         if (carga.getEstado() != EstadoCarga.PENDIENTE_PAGO) {
-            throw new RuntimeException("Error: La carga debe estar en PENDIENTE_PAGO.");
+            throw new RuntimeException("Error de estado: La carga debe estar en PENDIENTE_PAGO.");
         }
 
         // Lógica de tramos y montos...
@@ -43,11 +43,11 @@ public class PagoService {
         String tramo;
 
         if (peso.compareTo(new BigDecimal("1000")) >= 0 && peso.compareTo(new BigDecimal("1999")) <= 0) {
-            montoBase = new BigDecimal("200000");
+            montoBase = new BigDecimal("10");
             cargoFijo = "$50.000 CLP";
             tramo = "Tramo 1";
         } else {
-            montoBase = new BigDecimal("50000");
+            montoBase = new BigDecimal("10");
             cargoFijo = "$0 CLP";
             tramo = "Carga General";
         }
@@ -129,14 +129,5 @@ public class PagoService {
                 .fechaPago(p.getFechaPago())
                 .resultadoTransaccion(msj)
                 .build();
-    }
-
-    // 🆕 AGREGADO: Para cumplir con el método personalizado por parámetro que exige la guía del profesor
-    public PagoResponseDto obtenerPagoPorIdCarga(Long idCarga) {
-        Pago pago = pagoRepository.findAll().stream()
-                .filter(p -> idCarga.equals(p.getIdCarga()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No se encontró ningún pago asociado a la carga ID: " + idCarga));
-        return mapToResponseDto(pago, "Consulta por Carga", "$0 CLP", BigDecimal.ZERO, "Filtrado");
     }
 }
