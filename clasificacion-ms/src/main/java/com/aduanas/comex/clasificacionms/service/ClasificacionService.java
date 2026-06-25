@@ -31,64 +31,57 @@ public class ClasificacionService {
 
     @Transactional(rollbackFor = Exception.class)
     public ClasificacionResponseDTO evaluar(EvaluarClasificacionRequestDTO dto) {
+        // =========================================================================
+        // 1. VALIDACIÓN DE SEGURIDAD (Esto hace que tus tests de falla pasen)
+        // =========================================================================
+        if (dto == null) {
+            throw new IllegalArgumentException("La solicitud no puede ser nula");
+        }
+        if (dto.getValorDeclarado() == null || dto.getValorDeclarado().compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("El valor declarado no puede ser negativo");
+        }
+
         log.info("Iniciando auditoría tributaria y análisis de riesgo para Carga ID: {}", dto.getIdCarga());
 
         // =========================================================================
         // ANÁLISIS DE RIESGO ADUANERO 🕵️‍♂️
         // =========================================================================
-        String rutEvaluar = "12345678-9";
         boolean tieneRiesgo = false;
-
         try {
-            log.info("Consultando matriz de riesgos para RUT: {} y Origen: {}", dto.getImportadorRut(), dto.getPaisOrigen());
-
-            // ✅ CONECTADO: Riesgo ahora evalúa con el RUT real del importador que creó la carga
             tieneRiesgo = riesgoClient.evaluarRiesgoCarga(dto.getImportadorRut(), dto.getPaisOrigen());
         } catch (Exception e) {
             log.error("No se pudo conectar con riesgo-ms: {}", e.getMessage());
         }
 
         if (tieneRiesgo) {
-            log.warn("ALERTA: Carga ID {} RECHAZADA por la matriz de riesgo aduanero.", dto.getIdCarga());
-
-            String obsRechazo = "Carga rechazada por el Departamento de Gestión de Riesgos. País de origen o importador bajo observación.";
-
+            log.warn("ALERTA: Carga ID {} RECHAZADA.", dto.getIdCarga());
             Clasificacion clasificacionRechazada = Clasificacion.builder()
                     .idCarga(dto.getIdCarga())
                     .tipoClasificacion(TipoClasificacion.PROHIBIDA)
                     .permitido(false)
                     .montoImpuesto(BigDecimal.ZERO)
-                    .observaciones(obsRechazo)
+                    .observaciones("Rechazada por Gestión de Riesgos.")
                     .fechaEvaluacion(LocalDateTime.now())
                     .build();
-
             clasificacionRechazada = clasificacionRepository.save(clasificacionRechazada);
-
             try {
-                // ✅ CORREGIDO: Mandamos el estado como String o el Enum propio del MS, evitando acoplamiento cruzado de Enums
                 cargaClient.actualizarEstado(dto.getIdCarga(), BigDecimal.ZERO, "RECHAZADA", null);
             } catch (Exception e) {
-                log.error("Error al actualizar estado de rechazo en carga-ms: {}", e.getMessage());
+                log.error("Error al actualizar estado: {}", e.getMessage());
             }
-
             return mapToResponse(clasificacionRechazada);
         }
 
         // =========================================================================
-        // CÁLCULO DE ADUANA CHILE COMPLETO (Si no hay riesgo) 🇨🇱
+        // CÁLCULO DE IMPUESTOS (Si pasa el riesgo) 🇨🇱
         // =========================================================================
         BigDecimal valorCarga = dto.getValorDeclarado();
-
         BigDecimal arancel = valorCarga.multiply(new BigDecimal("0.06"));
-        BigDecimal baseIva = valorCarga.add(arancel);
-        BigDecimal iva = baseIva.multiply(new BigDecimal("0.19"));
+        BigDecimal iva = valorCarga.add(arancel).multiply(new BigDecimal("0.19"));
         BigDecimal impuestoTotal = arancel.add(iva);
 
-        String observaciones = String.format(
-                "Aprobado. Desglose: Arancel (6%%): $%s | IVA (19%%): $%s. Carga lista para recaudación.",
-                arancel.setScale(2, RoundingMode.HALF_UP),
-                iva.setScale(2, RoundingMode.HALF_UP)
-        );
+        String observaciones = String.format("Aprobado. Arancel: $%s | IVA: $%s.",
+                arancel.setScale(2, RoundingMode.HALF_UP), iva.setScale(2, RoundingMode.HALF_UP));
 
         Clasificacion clasificacion = Clasificacion.builder()
                 .idCarga(dto.getIdCarga())
@@ -100,46 +93,26 @@ public class ClasificacionService {
                 .build();
 
         clasificacion = clasificacionRepository.save(clasificacion);
-        log.info("Clasificación guardada de forma local con ID: {}", clasificacion.getIdClasificacion()); // ✅ CORREGIDO: idClasificacion
 
         // =========================================================================
-// ORQUESTACIÓN SÍNCRONA EN CASCADA
+        // ORQUESTACIÓN DE SERVICIOS
         // =========================================================================
         try {
-            log.info("1. Notificando cambio de estado a carga-ms como PENDIENTE_PAGO");
             cargaClient.actualizarEstado(dto.getIdCarga(), impuestoTotal, "PENDIENTE_PAGO", null);
-
-            log.info("2. Enviando orden de recaudación a pagos-ms para Carga ID: {}", dto.getIdCarga());
-            // ✅ ESTA ES LA LLAMADA CRUCIAL: Asegúrate que PagoClient use @RequestParam("idCarga")
             pagoClient.crearOrdenDePago(dto.getIdCarga(), impuestoTotal);
-
-            log.info("3. Generando documento DIN en documentos-ms");
             documentoClient.generarDeclaracionIngreso(dto.getIdCarga(), impuestoTotal, dto.getImportadorRut());
-
-
-            log.info("4. Enviando alerta de éxito a notificacion-ms");
-
-            // ✅ CAMBIO AQUÍ: Ahora creamos un Map y usamos el nuevo nombre del método
-            Map<String, Object> notifPayload = Map.of(
+            notificacionClient.enviarAlertaJson(Map.of(
                     "idCarga", dto.getIdCarga(),
-                    "destinatario", "importaciones@comex.cl", // Puedes usar un correo real o de prueba
-                    "mensaje", "Tu Carga N° " + dto.getIdCarga() + " fue clasificada con éxito. Total aduana a pagar: $" + impuestoTotal,
-                    "tipo", "EMAIL", // O SMS, SISTEMA
-                    "estado", "ENVIADA" // O PENDIENTE
-            );
-            notificacionClient.enviarAlertaJson(notifPayload); // ✅ Nuevo nombre del método y un solo argumento (el Map)
-
-            // ... (resto del bloque catch) ...
-
+                    "mensaje", "Carga clasificada con éxito. Total: $" + impuestoTotal,
+                    "estado", "ENVIADA"
+            ));
         } catch (Exception e) {
-            // Si algo falla, el log nos dirá exactamente qué servicio fue
-            log.error("⚠️ Error en la cadena de servicios: {}", e.getMessage());
+            log.error("⚠️ Error en cadena de servicios: {}", e.getMessage());
         }
 
         ClasificacionResponseDTO response = mapToResponse(clasificacion);
         response.setPeso(new BigDecimal("1500.00"));
         response.setValorDeclarado(valorCarga);
-
         return response;
     }
 
@@ -191,4 +164,7 @@ public class ClasificacionService {
                 .orElseThrow(() -> new RuntimeException("No existe"));
         cargaClient.actualizarEstado(idCarga, c.getMontoImpuesto(), estado, voucher);
     }
+
+
+
 }

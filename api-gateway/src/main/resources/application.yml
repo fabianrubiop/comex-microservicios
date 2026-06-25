@@ -42,6 +42,33 @@ spring:
           uri: lb://notificacion-ms
           predicates:
             - Path=/api/v1/notificaciones/**
+        - id: carga-swagger
+          uri: lb://carga-ms
+          predicates:
+            - Path=/carga-ms/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs  # 👈 Le quita el prefijo antes de enviarlo al MS interno
+
+        - id: banco-swagger
+          uri: lb://banco-ms
+          predicates:
+            - Path=/banco-ms/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: riesgo-swagger
+          uri: lb://riesgo-ms
+          predicates:
+            - Path=/riesgo-ms/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: documentos-swagger
+          uri: lb://documentos-ms
+          predicates:
+            - Path=/documentos-ms/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
 eureka:
   client:

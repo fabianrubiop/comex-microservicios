@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: banco-ms
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:comex123@eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: banco-ms

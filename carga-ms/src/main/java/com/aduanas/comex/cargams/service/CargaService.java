@@ -52,36 +52,40 @@ public class CargaService {
     public CargaResponseDTO crear(CrearCargaRequestDTO dto) {
         log.info("Iniciando registro de nueva carga: {}", dto.getNumeroDeclaracion());
 
-        // PASO A: Persistir localmente y liberar la transacción inmediatamente
+        // PASO A: Persistir localmente
         Carga carga = guardarCargaInicial(dto);
-        log.debug("Carga persistida con éxito de manera local con ID: {}", carga.getIdCarga());
+        log.debug("Carga persistida localmente con ID: {}", carga.getIdCarga());
 
-        // PASO B: Mapear datos reales para el microservicio externo de clasificación
+        // PASO B: Mapear datos para Clasificación
         ClasificacionRequestDTO extRequest = ClasificacionRequestDTO.builder()
                 .idCarga(carga.getIdCarga())
                 .descripcionMercancia(carga.getDescripcion())
                 .paisOrigen(carga.getPaisOrigen())
                 .valorDeclarado(carga.getValorDeclarado())
-                .importadorRut(carga.getImportadorRut()) // ✅ CONECTADO: Pasamos el RUT real de la BD
+                .importadorRut(carga.getImportadorRut())
                 .build();
 
-        log.info("Llamando de forma síncrona a clasificacion-cumplimiento-ms para Carga ID: {}", carga.getIdCarga());
-
-        // PASO C: Comunicación Feign segura.
+        // PASO C: Comunicación Feign
+        log.info("Llamando a clasificacion-ms para Carga ID: {}", carga.getIdCarga());
         ClasificacionResponseDTO extResponse = clasificacionClient.evaluar(carga.getIdCarga(), extRequest);
-        log.info("Respuesta recibida desde Clasificación. Permitido: {}", extResponse.getPermitido());
+        log.info("Respuesta recibida. Permitido: {}", extResponse.getPermitido());
 
-        // PASO D: Volver a leer la entidad fresca desde la BD (ya modificada por Clasificación con sus impuestos)
-        Carga cargaActualizada = obtenerEntidadPorId(carga.getIdCarga());
+        // PASO D: Actualizar el estado en memoria usando la respuesta externa
+        // No dependemos de una re-lectura de BD, usamos el objeto 'carga' que ya existe
+        EstadoCarga estadoFinal = Boolean.TRUE.equals(extResponse.getPermitido())
+                ? EstadoCarga.CLASIFICADA
+                : EstadoCarga.RECHAZADA;
 
-        // Si fue rechazada externamente, actualizamos el estado de manera aislada
-        if (Boolean.FALSE.equals(extResponse.getPermitido())) {
-            actualizarEstadoRechazado(cargaActualizada.getIdCarga());
-            cargaActualizada.setEstado(EstadoCarga.RECHAZADA);
+        carga.setEstado(estadoFinal);
+
+        // Si fue rechazada, guardamos explícitamente en BD el cambio de estado
+        if (EstadoCarga.RECHAZADA.equals(estadoFinal)) {
+            actualizarEstadoRechazado(carga.getIdCarga());
         }
 
-        // PASO E: Construir y retornar el DTO unificado final para Postman
-        return convertirADto(cargaActualizada, extResponse.getPermitido(), extResponse.getObservaciones());
+        // PASO E: Construir y retornar el DTO unificado
+        // Pasamos 'carga' actualizada y los datos de la respuesta externa
+        return convertirADto(carga, extResponse.getPermitido(), extResponse.getObservaciones());
     }
 
     /**

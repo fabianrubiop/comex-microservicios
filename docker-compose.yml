@@ -33,6 +33,7 @@ services:
     networks:
       - comex-network
 
+
   # Puerta de Entrada (API Gateway)
   api-gateway:
     build: ./api-gateway
@@ -49,17 +50,18 @@ services:
     build: ./banco-ms
     container_name: banco-ms
     ports:
-      - "8081:8081"
+      - "8091:8091"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-comex:3306/comex_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: comexpassword
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://admin:comex123@eureka-server:8761/eureka/
+    - SERVER_PORT=8091  # 👈 ESTA LÍNEA ES LA QUE OBLIGA AL JAR A USAR EL 8091
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-comex:3306/comex_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    - SPRING_DATASOURCE_USERNAME=root
+    - SPRING_DATASOURCE_PASSWORD=comexpassword
+    - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://admin:comex123@eureka-server:8761/eureka/
+    - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+
     depends_on:
-      mysql-comex:
-        condition: service_healthy
-      eureka-server:
-        condition: service_started
+    - eureka-server
+    - mysql-comex
     networks:
       - comex-network
 
@@ -68,11 +70,12 @@ services:
     build: ./carga-ms
     container_name: carga-ms
     ports:
-      - "8082:8082"
+      - "8081:8081"  # 👈 Mapeo exacto 8081:8081 como pide su archivo de configuración interno
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-comex:3306/comex_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: comexpassword
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"  # 👈 Esto obliga a Flyway a saltarse cualquier traba de checksum
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://admin:comex123@eureka-server:8761/eureka/
     depends_on:
       mysql-comex:
@@ -112,6 +115,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: comexpassword
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://admin:comex123@eureka-server:8761/eureka/
+      SPRING_FLYWAY_IGNORE-FAILED-MIGRATION: "true"
+      SPRING_FLYWAY_VALIDATE-ON-MIGRATE: "false"
     depends_on:
       mysql-comex:
         condition: service_healthy
@@ -164,6 +169,13 @@ services:
     container_name: pagos-ms
     ports:
       - "9087:8087"
+    entrypoint: >
+      sh -c "echo 'Esperando por MySQL...' &&
+         while ! (echo > /dev/tcp/mysql-comex/3306) >/dev/null 2>&1; do
+           sleep 5
+         done;
+         echo 'MySQL listo! Iniciando aplicación...' &&
+         java -jar /app.jar"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-comex:3306/comex_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root

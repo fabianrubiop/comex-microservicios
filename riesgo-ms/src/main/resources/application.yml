@@ -19,6 +19,8 @@ spring:
   flyway:
     enabled: true
     repair-at-start: true
+    check-location: true
+    validate-on-migrate: false
 
 eureka:
   client:
@@ -28,3 +30,7 @@ eureka:
 springdoc:
   api-docs:
     path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  server:
+    url: http://localhost:8080

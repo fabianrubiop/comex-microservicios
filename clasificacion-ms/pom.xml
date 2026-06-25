@@ -100,6 +100,35 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/com/aduanas/comex/clasificacionms/dto/**</exclude>
+                        <exclude>**/com/aduanas/comex/clasificacionms/entity/**</exclude>
+                        <exclude>**/com/aduanas/comex/clasificacionms/enums/**</exclude>
+                        <exclude>**/com/aduanas/comex/clasificacionms/config/**</exclude>
+                        <exclude>**/com/aduanas/comex/clasificacionms/client/**</exclude>
+                        <exclude>**/com/aduanas/comex/clasificacionms/ClasificacionMsApplication*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
